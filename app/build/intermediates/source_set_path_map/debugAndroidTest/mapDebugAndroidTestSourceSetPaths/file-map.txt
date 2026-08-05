@@ -1,0 +1,4 @@
+com.necroware.terminusplayer.test.app-androidTest-0 C:\Users\USER\Downloads\terminus-native\app\build\generated\res\resValues\androidTest\debug
+com.necroware.terminusplayer.test.app-mergeDebugAndroidTestResources-1 C:\Users\USER\Downloads\terminus-native\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.necroware.terminusplayer.test.app-mergeDebugAndroidTestResources-2 C:\Users\USER\Downloads\terminus-native\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.necroware.terminusplayer.test.app-debugAndroidTest-3 C:\Users\USER\Downloads\terminus-native\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

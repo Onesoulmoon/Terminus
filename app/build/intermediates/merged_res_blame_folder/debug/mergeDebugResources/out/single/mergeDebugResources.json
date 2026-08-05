@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/font_jetbrains_mono_regular.ttf.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/font/jetbrains_mono_regular.ttf"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/font_jetbrains_mono_medium.ttf.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/font/jetbrains_mono_medium.ttf"
+    },
+    {
+        "merged": "com.necroware.terminusplayer.app-debug-68:/font_jetbrains_mono_bold.ttf.flat",
+        "source": "com.necroware.terminusplayer.app-main-70:/font/jetbrains_mono_bold.ttf"
+    }
+]

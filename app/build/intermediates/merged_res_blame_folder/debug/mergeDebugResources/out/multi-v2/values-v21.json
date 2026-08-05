@@ -1,0 +1,47 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.necroware.terminusplayer.app-mergeDebugResources-66:/values-v21/values-v21.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-4\\7d0750361d44e6af64679734d13cbc38\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,13",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,173,237,304,368,484,610,736,864,1036",
+                        "endLines": "2,3,4,5,6,7,8,9,12,17",
+                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
+                        "endOffsets": "168,232,299,363,479,605,731,859,1031,1383"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,14,18,22,25",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,173,237,304,368,484,929,1217,1506,1678",
+                        "endLines": "2,3,4,5,6,7,14,18,24,29",
+                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
+                        "endOffsets": "168,232,299,363,479,605,1050,1340,1673,2025"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-4\\b2ce6b2de5b1e075ed16a20b94f38b15\\transformed\\media3-session-1.4.0\\res\\values-v21\\values-v21.xml",
+                    "from": {
+                        "startLines": "2,5,8,11",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,217,374,536",
+                        "endLines": "4,7,10,13",
+                        "endColumns": "10,10,10,10",
+                        "endOffsets": "212,369,531,692"
+                    },
+                    "to": {
+                        "startLines": "8,11,15,19",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "610,772,1055,1345",
+                        "endLines": "10,13,17,21",
+                        "endColumns": "10,10,10,10",
+                        "endOffsets": "767,924,1212,1501"
+                    }
+                }
+            ]
+        }
+    ]
+}
