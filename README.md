@@ -1,3 +1,16 @@
+<img width="540" height="1273" alt="ef3178e0-aca4-4a79-b8d4-8c5d191ade30" src="https://github.com/user-attachments/assets/3ae426c4-7844-410b-8112-4f1687930e8c" /> <img width="540" height="1273" alt="297dc6d1-38f6-4416-9a71-df40ec83062f" src="https://github.com/user-attachments/assets/843000f0-4706-4a61-a686-a8ff180b66cb" /> <img width="540" height="1273" alt="9915d781-6037-4c48-bc16-68e66f04307b" src="https://github.com/user-attachments/assets/00d82bcb-ff10-4d2d-a3db-b9ed89497e59" /> <img width="540" height="1273" alt="2b67136b-2df2-4bd9-9287-b8491738bd74" src="https://github.com/user-attachments/assets/991b869b-7602-4fcb-8750-f73aafd3e879" />
+<img width="540" height="1273" alt="d818dffd-5b06-41c2-a2d8-34609f9518f8" src="https://github.com/user-attachments/assets/0cd58323-43a8-4732-8646-57e2db04ff44" />
+
+
+
+
+
+
+
+
+
+
+
 # ▄▀▄▀▄ Terminus Player ▄▀▄▀▄
 
 Native Kotlin + Jetpack Compose. Package: `com.necroware.terminusplayer`.
