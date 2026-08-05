@@ -47,7 +47,7 @@ Data Visualization Suite:
 - Fast Local Search: Real-time search across tracks, artists, and playlists.
 
 ## Tech Stack & Architecture
-- Language: 100% Kotlin
+- Language: 69% Java, 31% Kotlin
 
 - UI Framework: Jetpack Compose (Single-Activity Architecture)
 
