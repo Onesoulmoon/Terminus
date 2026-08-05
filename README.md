@@ -1,17 +1,17 @@
-# Terminus Player
+# ▄▀▄▀▄ Terminus Player ▄▀▄▀▄
 
 Native Kotlin + Jetpack Compose. Package: `com.necroware.terminusplayer`.
 
-## Stack
+## ╬Stack╬
 Kotlin · Jetpack Compose (Material 3, no Material You) · Media3 ExoPlayer ·
 Room · Hilt · KSP · Coil (album art) · JetBrains Mono (bundled, OFL license)
 · minSdk 29 (Android 10+)
 
-## Terminal Music Player
+## ≡≡≡Terminal Music Player≡≡≡
 An audio player for Android built entirely with Kotlin and Jetpack Compose. 
 Terminus Player combines offline media playback with listening statistics, audio customization, and a componentized UI.
 
-# Features
+# █▄Features▄█
 
 ## Audio & Playback Engine
 Background Playback Service: Powered by a foreground MusicService for playback uninterrupted by app lifecycle changes or device sleep.
