@@ -1,7 +1,5 @@
 # A cyberpunk-inspired offline music player for Android.
 
-[ [DOWNLOAD APK](https://github.com/Onesoulmoon/Terminus/releases/download/v1.3.5/terminus.apk) ]                                        [ [VIEW RELEASES ](https://github.com/Onesoulmoon/Terminus/releases)]
-
 ────────────────────────────────────────────────
 
 <img width="220" height="540" alt="efb7c74f-1bf0-4e24-8859-a6792f13a570" src="https://github.com/user-attachments/assets/841dd044-1232-4992-8c77-10df06b5ee79" /> <img width="220" height="540" alt="image" src="https://github.com/user-attachments/assets/375a9f1e-56c5-4f60-a2c5-6fc5e7884458" />
