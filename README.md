@@ -30,11 +30,11 @@ The result is a music player that feels less like a conventional media applicati
 
 ## Status
 
-**Current release: `1.4.1`**
+**Current release: `1.6.0`**
 
 Terminus is currently a functional local music player with persistent playback state, playlists, search, history/statistics, album artwork, background playback, queue management, audio controls, widgets, customizable visual behavior, and a complete terminal-inspired interface.
 
-The `1.4.1` release represents the current major polish pass, bringing together:
+The `1.6.0` release represents the current major polish pass, bringing together:
 
 * **Dual-Player Engine & Audio FX**:
   Built a dual `ExoPlayer` engine enabling smooth, linear crossfading between tracks.
