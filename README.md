@@ -30,38 +30,27 @@ The result is a music player that feels less like a conventional media applicati
 
 ## Status
 
-**Current release: `1.6.0`**
+**Current release: `1.8.0`**
 
 Terminus is currently a functional local music player with persistent playback state, playlists, search, history/statistics, album artwork, background playback, queue management, audio controls, widgets, customizable visual behavior, and a complete terminal-inspired interface.
 
-The `1.6.0` release represents the current major polish pass, bringing together:
+The `1.8.0` release represents the current major polish pass, bringing together:
 
-* **Dual-Player Engine & Audio FX**:
-  Built a dual `ExoPlayer` engine enabling smooth, linear crossfading between tracks.
-  Integrated a 5-band hardware Equalizer (-15 dB to +15 dB gain mapping) anchored to active audio session IDs.
+### Terminus Player — Release Notes
 
+####  Visual & Display Engine Upgrades
 
-* **ASCII Micro-Burst Controls & Retro Aesthetics**:
-  Created dynamic particle burst animations (`█`, `▓`, `▒`, `░`) that explode outward on button taps (`>>|`, `|<<`, Play/Pause).
-  Designed a retro terminal boot screen (`TerminalBootScreen`) with simulated hardware checks and ASCII logo initialization.
-  Built a high-speed hardware-accelerated Canvas renderer (`ColoredAsciiAlbumArt`) that maps album art brightness and RGB colors into ASCII density characters in real time.
-  Added a CRT scanline visual overlay layer (`CrtScanlineOverlay`).
+* **Cathodique CRT Glass Album Art Mode:** Real-time AGSL CRT shader with pincushion barrel distortion, chromatic aberration, dynamic scanlines, random static noise, and a retro ViewSonic OSD overlay (`CrtCathodiqueAlbumArt.kt`).
+* **8-Bit Pixelated Album Art Mode:** Nearest-neighbor downscaling renderer with customizable pixel density and an optional retro pixel mesh overlay (`PixelatedAlbumArt.kt`).
+* **Redesigned Albums Screen:** Replaced rectangular list items with a 2-column square card grid featuring large artwork frames and technical track badges (`AlbumsScreen.kt`).
+* **Settings UI Telemetry Card:** Embedded `TacticalAudioMonitorCard` directly into settings alongside display mode pickers and DSP toggles (`SettingsScreen.kt`).
 
+####  Tactical Lyrics System & Palette Engine
 
-* **Live Waveform Visualizer (`SIGNAL // LIVE`)**:
-  Linked ExoPlayer’s `audioSessionId` directly to an `AudioVisualizerHelper` tapping 8-bit PCM waveform buffers.
-  Rendered a real-time symmetrical top-and-bottom vertical bar spectrum canvas in the header with zero playback lag.
-
-
-* **Background-Safe App Widget**:
-  Implemented an async `BroadcastReceiver` (`TerminusWidgetReceiver`) that connects to `MusicService` via Media3 `SessionToken`.
-  Prevented system background crashes (`ForegroundServiceStartNotAllowedException`) while enabling full home screen playback and track switching controls.
-
-
-* **60–120 FPS Rendering & Fluidity Optimizations**:
-  Deferred high-frequency progress state reads directly into the Compose Draw phase (`Canvas`) to bypass unnecessary layout recompositions.
-  Flattened 2D ASCII matrices into 1D primitive arrays (`FastAsciiMatrix`) to eliminate Garbage Collection pauses on the main UI thread.
-  Offloaded heavy bitmap downscaling to `Dispatchers.Default` and used `Modifier.graphicsLayer` for GPU-accelerated button transforms.
+* **Adaptive Multi-Color Lyrics View:** JetBrains Mono terminal lyrics view that extracts vibrant color swatches from the current album art in real time, featuring staggered line alignments and active line cursor tracking (`TacticalAdaptiveLyricsView.kt`, `PaletteExtractor.kt`).
+* **Multi-Source Lyric Resolver Pipeline:** Unified fallback chain across embedded ID3/FLAC tags (`USLT`), local sidecar `.lrc` files, and LRCLIB remote network queries (`LyricRepository.kt`).
+* **404 Resolution & Sanitization:** Title/artist cleaning regex, custom `User-Agent` header injection, and fuzzy search fallback (`/api/search`) to fix failed API lookups.
+* **Track Sync Fix:** Keyed lyric loading directly to track changes (`currentTrack.id`) to purge stale state and auto-scroll to current position.
 
 
 # Contents
