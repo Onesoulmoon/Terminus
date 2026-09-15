@@ -30,27 +30,44 @@ The result is a music player that feels less like a conventional media applicati
 
 ## Status
 
-**Current release: `1.8.0`**
+**Current release: `2.1.0`**
 
 Terminus is currently a functional local music player with persistent playback state, playlists, search, history/statistics, album artwork, background playback, queue management, audio controls, widgets, customizable visual behavior, and a complete terminal-inspired interface.
 
-The `1.8.0` release represents the current major polish pass, bringing together:
+The `2.1.0` release represents the current major polish pass, bringing together:
 
-### Terminus Player — Release Notes
+# TERMINUS PLAYER — RELEASE NOTES
 
-####  Visual & Display Engine Upgrades
+**Build Target:** v2.1.0-CRT
 
-* **Cathodique CRT Glass Album Art Mode:** Real-time AGSL CRT shader with pincushion barrel distortion, chromatic aberration, dynamic scanlines, random static noise, and a retro ViewSonic OSD overlay (`CrtCathodiqueAlbumArt.kt`).
-* **8-Bit Pixelated Album Art Mode:** Nearest-neighbor downscaling renderer with customizable pixel density and an optional retro pixel mesh overlay (`PixelatedAlbumArt.kt`).
-* **Redesigned Albums Screen:** Replaced rectangular list items with a 2-column square card grid featuring large artwork frames and technical track badges (`AlbumsScreen.kt`).
-* **Settings UI Telemetry Card:** Embedded `TacticalAudioMonitorCard` directly into settings alongside display mode pickers and DSP toggles (`SettingsScreen.kt`).
+**Focus:** Audio Engine Optimization, System Integration & ASCII Animation Suite
 
-####  Tactical Lyrics System & Palette Engine
+---
 
-* **Adaptive Multi-Color Lyrics View:** JetBrains Mono terminal lyrics view that extracts vibrant color swatches from the current album art in real time, featuring staggered line alignments and active line cursor tracking (`TacticalAdaptiveLyricsView.kt`, `PaletteExtractor.kt`).
-* **Multi-Source Lyric Resolver Pipeline:** Unified fallback chain across embedded ID3/FLAC tags (`USLT`), local sidecar `.lrc` files, and LRCLIB remote network queries (`LyricRepository.kt`).
-* **404 Resolution & Sanitization:** Title/artist cleaning regex, custom `User-Agent` header injection, and fuzzy search fallback (`/api/search`) to fix failed API lookups.
-* **Track Sync Fix:** Keyed lyric loading directly to track changes (`currentTrack.id`) to purge stale state and auto-scroll to current position.
+**1. Performance & Audio Pipeline**
+
+* **Off-Main-Thread Tag Parsing:** Migrated all ID3 tag scanning, MediaMetadataRetriever extraction, and bitmap artwork decoding to `Dispatchers.IO` to eliminate UI main thread stutter during track switches.
+* **ExoPlayer Seamless Pre-Buffering:** Integrated direct `MediaItem` queueing to allow ExoPlayer to pre-buffer the upcoming track ($N+1$) in the background for zero-gap playback transitions.
+* **Audio Engine Hardware Fallback:** Added capability checks via `AudioManager` in `AudioEngine.kt`. The playback engine now dynamically enables hardware offload scheduling when supported, falling back gracefully to ExoPlayer software codecs without crashing or dropping frames.
+
+**2. System Integration & Media3 Controls**
+
+* **Default Audio Handler:** Configured `AndroidManifest.xml` with `<intent-filter>` support for `android.intent.action.VIEW` handling `file://` and `content://` schemes across all `audio/*` MIME types.
+* **Updated Control Symbols:** Updated global transport control glyphs to `⇎` for **Shuffle** and `↻` for **Repeat**.
+* **Status Bar & Lock Screen Integration:** Overrode `DefaultMediaNotificationProvider` in `MusicService.kt` with `ic_terminus_status_icon`. Extended Media3 `MediaSession` custom layouts with `CommandButton` actions for **Like** and **Shuffle** (`⇎`).
+
+**3. CRT Visual Polish & Navigation Micro-Animations**
+
+* **Interactive Navigation Bar:**
+* **Home (`>_`):** Added a cursor wink (`-`) and horizontal spring nudge on tap.
+* **Playlist (`▥`):** Implemented an elastic spring compression effect ($1.4\times$ scale $X$, $0.7\times$ scale $Y$).
+* **Stats (`#`):** Applied a high-frequency Y-axis matrix glitch jitter on press.
+* **Settings (`*`):** Added a 360-degree gear rotation driven by a spring physics spec.
+
+
+* **Terminal Typewriter Header:** Integrated `TerminalTypewriterHeader` across all main sections. Section names now render character-by-character upon tab selection, anchored by a 500ms blinking `_` cursor.
+* **Music Symbol Ticker Header:** Created `AsciiMusicHeader` cycling through ASCII music notation characters (`𝄞`, `𝄢`, `𝄩`, `♩`) inside `[ ]` brackets every 250ms.
+
 
 
 # Contents
