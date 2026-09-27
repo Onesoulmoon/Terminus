@@ -30,44 +30,70 @@ The result is a music player that feels less like a conventional media applicati
 
 ## Status
 
-**Current release: `2.1.0`**
+**Current release: `2.3.0`**
 
 Terminus is currently a functional local music player with persistent playback state, playlists, search, history/statistics, album artwork, background playback, queue management, audio controls, widgets, customizable visual behavior, and a complete terminal-inspired interface.
 
-The `2.1.0` release represents the current major polish pass, bringing together:
+The `2.3.0` release represents the current major polish pass, bringing together:
 
 # TERMINUS PLAYER — RELEASE NOTES
 
-**Build Target:** v2.1.0-CRT
+**Build Target:** v2.3.0
 
-**Focus:** Audio Engine Optimization, System Integration & ASCII Animation Suite
+### 1. White Trace Visualizer Line
+* **`AudioSpectrumVisualizer.kt` & `SignalLiveHeader.kt`**:
+  * Updated the waveform trace line to pure crisp **white (`Color.White`)**, ensuring clean, high-contrast visibility across black & white and dark album art.
 
----
+### 2. Dynamic Metric Log Messages
+* **`SystemInfoCard.kt` (`TerminalMetricLogCard`)**:
+  * Integrated dynamic typewriter log messages matching your reference format:
+    ```
+    METRIC // TOP_ARTIST: 'Yeat' leading the log tracking matrix index with 9 recorded playback cycles this week.
+    ```
 
-**1. Performance & Audio Pipeline**
+### 3. Retro Terminal / ASCII VU Meter
+* **`AnalogVuMeterCard.kt`**:
+  * Transformed the VU meter into a terminal/ASCII gauge featuring:
+    * Monospace dB scale ticks (`-20 -13 -10 -7 -5 -3 0 +3 dB`).
+    * Real-time digital dB readout `[ -04.2 dB ]`.
+    * CRT grid markings and a bottom LED block segment gauge `[ ██████████░░░░░░ ]`.
 
-* **Off-Main-Thread Tag Parsing:** Migrated all ID3 tag scanning, MediaMetadataRetriever extraction, and bitmap artwork decoding to `Dispatchers.IO` to eliminate UI main thread stutter during track switches.
-* **ExoPlayer Seamless Pre-Buffering:** Integrated direct `MediaItem` queueing to allow ExoPlayer to pre-buffer the upcoming track ($N+1$) in the background for zero-gap playback transitions.
-* **Audio Engine Hardware Fallback:** Added capability checks via `AudioManager` in `AudioEngine.kt`. The playback engine now dynamically enables hardware offload scheduling when supported, falling back gracefully to ExoPlayer software codecs without crashing or dropping frames.
+### 4. Visualizer Alignment Fix in Library
+* **`LibraryScreen.kt` (`SongRow`)**:
+  * Wrapped the mini `AsciiVisualizer` in a dedicated fixed-width `Box` (`36.dp`), completely eliminating layout shifts and preventing any overlap or mismatch with artist and title text.
 
-**2. System Integration & Media3 Controls**
+### 5. Search Song Click Bug Fix
+* **`PlaybackController.kt` & `SearchViewModel.kt`**:
+  * Updated `playTrackFromSearch` so that selecting a song from search constructs a queue starting with that exact song at index 0.
+  * Clicking "Turban by Yeat" (or any searched track) **always plays that exact song immediately** without shuffle index jumps.
 
-* **Default Audio Handler:** Configured `AndroidManifest.xml` with `<intent-filter>` support for `android.intent.action.VIEW` handling `file://` and `content://` schemes across all `audio/*` MIME types.
-* **Updated Control Symbols:** Updated global transport control glyphs to `⇎` for **Shuffle** and `↻` for **Repeat**.
-* **Status Bar & Lock Screen Integration:** Overrode `DefaultMediaNotificationProvider` in `MusicService.kt` with `ic_terminus_status_icon`. Extended Media3 `MediaSession` custom layouts with `CommandButton` actions for **Like** and **Shuffle** (`⇎`).
+### 6. Hierarchical Folder Browser & Interactive Folder Click
+* **`LibraryViewModel.kt` & `LibraryScreen.kt`**:
+  * Upgraded `LibraryTab.FOLDERS` from a flat string list to a **full hierarchical directory browser**:
+    * Browse top-level root folders (`[📁 FOLDER_NAME]`).
+    * Navigate into subdirectories and go back up (`[..] UP ONE LEVEL`).
+    * View and play songs residing directly inside any folder (`[🎵 SONG_TITLE]`).
 
-**3. CRT Visual Polish & Navigation Micro-Animations**
+### 7. Exclusive USB HQ Direct Audio Output
+* **`AudioEngine.kt` & `SettingsScreen.kt`**:
+  * Added uncompressed bit-perfect 24-bit/96kHz/192kHz direct USB audio routing.
+  * Added a toggle setting under **Settings > Hardware Audio Output**.
 
-* **Interactive Navigation Bar:**
-* **Home (`>_`):** Added a cursor wink (`-`) and horizontal spring nudge on tap.
-* **Playlist (`▥`):** Implemented an elastic spring compression effect ($1.4\times$ scale $X$, $0.7\times$ scale $Y$).
-* **Stats (`#`):** Applied a high-frequency Y-axis matrix glitch jitter on press.
-* **Settings (`*`):** Added a 360-degree gear rotation driven by a spring physics spec.
+### 8. Hex Dump Background Overlay Mode
+* **`MotionMode.kt`, `MainActivity.kt` & `SettingsScreen.kt`**:
+  * Added `MotionMode.HEX_DUMP`.
+  * Selecting `HEX_DUMP` in **Settings > Performance > Visual Motion** renders the `MatrixHexDumpTerminal` in the background with live mutating memory addresses.
 
-
-* **Terminal Typewriter Header:** Integrated `TerminalTypewriterHeader` across all main sections. Section names now render character-by-character upon tab selection, anchored by a 500ms blinking `_` cursor.
-* **Music Symbol Ticker Header:** Created `AsciiMusicHeader` cycling through ASCII music notation characters (`𝄞`, `𝄢`, `𝄩`, `♩`) inside `[ ]` brackets every 250ms.
-
+### 9. Multi-Color Dynamic Palette System
+* **`PaletteExtractor.kt` & `Theme.kt`**:
+  * Extended `generateTerminalPalette` to extract 5 distinct vibrant colors (`primaryAccent`, `secondaryAccent`, `tertiaryAccent`, `highlightAccent`, `mutedAccent`).
+* **Applied across all headers, section badges & search**:
+  * **Headers & Typewriter Cursor `_`**: Title text renders in `primaryAccent`, while the blinking cursor `_` renders in `highlightAccent`.
+  * **Search Screen**: `SEARCH_` title in `secondaryAccent`, prompt `> ` in `tertiaryAccent`, cursor `_` in `highlightAccent`, clear `[X]` in `highlightAccent`.
+  * **Home Screen**: `> SHUFFLE ALL` in `secondaryAccent`, subtitle in `tertiaryAccent`.
+  * **Library Tabs**: `[SONGS]`, `[ALBUMS]`, `[ARTISTS]`, `[FOLDERS]` each display distinct vibrant colors.
+  * **Playlists Badges**: `[ LIKED SONGS ]`, `[ RECENTLY ADDED ]`, `[ MOST PLAYED ]`, `[ RECENTLY PLAYED ]` each display distinct vibrant colors.
+  * **Stats Badges**: `[TODAY]`, `[WEEK]`, `[MONTH]`, `[YEAR]`, `[ALL TIME]` each display distinct vibrant colors so every section pops.
 
 
 # Contents
