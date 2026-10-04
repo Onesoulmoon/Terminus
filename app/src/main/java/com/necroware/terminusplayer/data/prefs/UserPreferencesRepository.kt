@@ -21,9 +21,25 @@ private object Keys {
     val CROSSFADE_ENABLED = booleanPreferencesKey("crossfade_enabled")
     val CROSSFADE_DURATION_MS = intPreferencesKey("crossfade_duration_ms")
     val PREFER_HW_DECODER = booleanPreferencesKey("prefer_hw_decoder")
-    val PLAYBACK_ART_STYLE = stringPreferencesKey("playback_art_style")
     val LAST_PLAYED_SONG_ID = longPreferencesKey("last_played_song_id")
     val LAST_PLAYED_POSITION_MS = longPreferencesKey("last_played_position_ms")
+    val LAST_PLAYED_QUEUE_IDS = stringPreferencesKey("last_played_queue_ids") // Stored as comma-separated string
+    val USE_DYNAMIC_THEME = booleanPreferencesKey("use_dynamic_theme")
+    val DYNAMIC_THEME_MODE = stringPreferencesKey("dynamic_theme_mode")
+    val USE_CUSTOM_ART_ALTERNATIVES = booleanPreferencesKey("use_custom_art_alternatives")
+    val ALBUM_ART_MODE = stringPreferencesKey("album_art_mode")
+    val SHUFFLE_ENABLED = booleanPreferencesKey("shuffle_enabled")
+    val REPEAT_MODE = intPreferencesKey("repeat_mode")
+    val AUDIO_MONITOR_ENABLED = booleanPreferencesKey("audio_monitor_enabled")
+    val VISUALIZER_MODE = stringPreferencesKey("visualizer_mode")
+    val MATRIX_BG_ENABLED = booleanPreferencesKey("matrix_bg_enabled")
+    val USB_EXCLUSIVE_HQ_ENABLED = booleanPreferencesKey("usb_exclusive_hq_enabled")
+    val REALTIME_VISUALIZER_ENABLED = booleanPreferencesKey("realtime_visualizer_enabled")
+    val EQ_PREAMP_GAIN = androidx.datastore.preferences.core.floatPreferencesKey("eq_preamp_gain")
+    val EQ_HP_ENABLED = booleanPreferencesKey("eq_hp_enabled")
+    val EQ_HP_FREQ = androidx.datastore.preferences.core.floatPreferencesKey("eq_hp_freq")
+    val EQ_LP_ENABLED = booleanPreferencesKey("eq_lp_enabled")
+    val EQ_LP_FREQ = androidx.datastore.preferences.core.floatPreferencesKey("eq_lp_freq")
 }
 
 private fun eqBandKey(index: Int) = intPreferencesKey("${Keys.EQ_BAND_PREFIX}$index")
@@ -43,10 +59,6 @@ class UserPreferencesRepository @Inject constructor(
             it[Keys.SORT_FIELD] = order.field.name
             it[Keys.SORT_DIRECTION] = order.direction.name
         }
-    }
-
-    suspend fun setPlaybackArtStyle(style: PlaybackArtStyle) {
-        dataStore.edit { it[Keys.PLAYBACK_ART_STYLE] = style.name }
     }
 
     suspend fun setEqualizerEnabled(enabled: Boolean) {
@@ -73,7 +85,7 @@ class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.PREFER_HW_DECODER] = enabled }
     }
 
-    suspend fun setLastPlayed(songId: Long?, positionMs: Long) {
+    suspend fun setLastPlayed(songId: Long?, positionMs: Long, queueIds: List<Long> = emptyList()) {
         dataStore.edit { prefs ->
             if (songId != null) {
                 prefs[Keys.LAST_PLAYED_SONG_ID] = songId
@@ -81,7 +93,76 @@ class UserPreferencesRepository @Inject constructor(
                 prefs.remove(Keys.LAST_PLAYED_SONG_ID)
             }
             prefs[Keys.LAST_PLAYED_POSITION_MS] = positionMs
+            if (queueIds.isNotEmpty()) {
+                prefs[Keys.LAST_PLAYED_QUEUE_IDS] = queueIds.joinToString(",")
+            } else {
+                prefs.remove(Keys.LAST_PLAYED_QUEUE_IDS)
+            }
         }
+    }
+
+    suspend fun setUseDynamicTheme(enabled: Boolean) {
+        dataStore.edit { it[Keys.USE_DYNAMIC_THEME] = enabled }
+    }
+
+    suspend fun setDynamicThemeMode(mode: DynamicThemeMode) {
+        dataStore.edit { it[Keys.DYNAMIC_THEME_MODE] = mode.name }
+    }
+
+    suspend fun setUseCustomArtAlternatives(enabled: Boolean) {
+        dataStore.edit { it[Keys.USE_CUSTOM_ART_ALTERNATIVES] = enabled }
+    }
+
+    suspend fun setAlbumArtMode(mode: AlbumArtMode) {
+        dataStore.edit { it[Keys.ALBUM_ART_MODE] = mode.name }
+    }
+
+    suspend fun setShuffleEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.SHUFFLE_ENABLED] = enabled }
+    }
+
+    suspend fun setRepeatMode(mode: Int) {
+        dataStore.edit { it[Keys.REPEAT_MODE] = mode }
+    }
+
+    suspend fun setAudioMonitorEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.AUDIO_MONITOR_ENABLED] = enabled }
+    }
+
+    suspend fun setVisualizerMode(mode: VisualizerMode) {
+        dataStore.edit { it[Keys.VISUALIZER_MODE] = mode.name }
+    }
+
+    suspend fun setMatrixBgEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.MATRIX_BG_ENABLED] = enabled }
+    }
+
+    suspend fun setUsbExclusiveHqEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.USB_EXCLUSIVE_HQ_ENABLED] = enabled }
+    }
+
+    suspend fun setRealtimeVisualizerEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.REALTIME_VISUALIZER_ENABLED] = enabled }
+    }
+
+    suspend fun setPreampGain(gain: Float) {
+        dataStore.edit { it[Keys.EQ_PREAMP_GAIN] = gain }
+    }
+
+    suspend fun setHighPassEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.EQ_HP_ENABLED] = enabled }
+    }
+
+    suspend fun setHighPassFreq(freq: Float) {
+        dataStore.edit { it[Keys.EQ_HP_FREQ] = freq }
+    }
+
+    suspend fun setLowPassEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.EQ_LP_ENABLED] = enabled }
+    }
+
+    suspend fun setLowPassFreq(freq: Float) {
+        dataStore.edit { it[Keys.EQ_LP_FREQ] = freq }
     }
 
     private fun Preferences.toUserPreferences(): UserPreferences {
@@ -92,25 +173,48 @@ class UserPreferencesRepository @Inject constructor(
             ?: defaults.librarySortOrder.field
         val sortDirection = this[Keys.SORT_DIRECTION]?.let { runCatching { SortDirection.valueOf(it) }.getOrNull() }
             ?: defaults.librarySortOrder.direction
-        val playbackArtStyle = this[Keys.PLAYBACK_ART_STYLE]?.let { runCatching { PlaybackArtStyle.valueOf(it) }.getOrNull() }
-            ?: defaults.playbackArtStyle
-        val eqBands = List(5) { index -> this[eqBandKey(index)] ?: 0 }
+        val albumArtMode = this[Keys.ALBUM_ART_MODE]?.let { runCatching { AlbumArtMode.valueOf(it) }.getOrNull() }
+            ?: defaults.albumArtMode
+        val dynamicThemeMode = this[Keys.DYNAMIC_THEME_MODE]?.let { runCatching { DynamicThemeMode.valueOf(it) }.getOrNull() }
+            ?: defaults.dynamicThemeMode
+        val visualizerMode = this[Keys.VISUALIZER_MODE]?.let { runCatching { VisualizerMode.valueOf(it) }.getOrNull() }
+            ?: defaults.visualizerMode
+        val matrixBgEnabled = this[Keys.MATRIX_BG_ENABLED] ?: defaults.matrixBgEnabled
+        val eqBands = List(10) { index -> this[eqBandKey(index)] ?: 0 } // Expanded to 10 for better EQ
+
+        val queueIds = this[Keys.LAST_PLAYED_QUEUE_IDS]?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
 
         return UserPreferences(
             themeId = themeId,
             librarySortOrder = LibrarySortOrder(sortField, sortDirection),
             equalizer = EqualizerSettings(
                 enabled = this[Keys.EQ_ENABLED] ?: defaults.equalizer.enabled,
-                bandGainsDb = eqBands
+                bandGainsDb = eqBands,
+                preampGainDb = this[Keys.EQ_PREAMP_GAIN] ?: defaults.equalizer.preampGainDb,
+                highPassEnabled = this[Keys.EQ_HP_ENABLED] ?: defaults.equalizer.highPassEnabled,
+                highPassFreq = this[Keys.EQ_HP_FREQ] ?: defaults.equalizer.highPassFreq,
+                lowPassEnabled = this[Keys.EQ_LP_ENABLED] ?: defaults.equalizer.lowPassEnabled,
+                lowPassFreq = this[Keys.EQ_LP_FREQ] ?: defaults.equalizer.lowPassFreq
             ),
             crossfade = CrossfadeSettings(
                 enabled = this[Keys.CROSSFADE_ENABLED] ?: defaults.crossfade.enabled,
                 durationMs = this[Keys.CROSSFADE_DURATION_MS] ?: defaults.crossfade.durationMs
             ),
             preferHardwareDecoder = this[Keys.PREFER_HW_DECODER] ?: defaults.preferHardwareDecoder,
-            playbackArtStyle = playbackArtStyle,
             lastPlayedSongId = this[Keys.LAST_PLAYED_SONG_ID],
-            lastPlayedPositionMs = this[Keys.LAST_PLAYED_POSITION_MS] ?: 0L
+            lastPlayedPositionMs = this[Keys.LAST_PLAYED_POSITION_MS] ?: 0L,
+            lastPlayedQueueIds = queueIds,
+            useDynamicTheme = this[Keys.USE_DYNAMIC_THEME] ?: defaults.useDynamicTheme,
+            dynamicThemeMode = dynamicThemeMode,
+            useCustomArtAlternatives = this[Keys.USE_CUSTOM_ART_ALTERNATIVES] ?: defaults.useCustomArtAlternatives,
+            albumArtMode = albumArtMode,
+            shuffleEnabled = this[Keys.SHUFFLE_ENABLED] ?: defaults.shuffleEnabled,
+            repeatMode = this[Keys.REPEAT_MODE] ?: defaults.repeatMode,
+            audioMonitorEnabled = this[Keys.AUDIO_MONITOR_ENABLED] ?: defaults.audioMonitorEnabled,
+            visualizerMode = visualizerMode,
+            matrixBgEnabled = matrixBgEnabled,
+            usbExclusiveHqEnabled = this[Keys.USB_EXCLUSIVE_HQ_ENABLED] ?: defaults.usbExclusiveHqEnabled,
+            realtimeVisualizerEnabled = this[Keys.REALTIME_VISUALIZER_ENABLED] ?: defaults.realtimeVisualizerEnabled
         )
     }
 }

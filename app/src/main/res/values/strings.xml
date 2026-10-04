@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TERMINUS</string>
     <string name="playback_channel_name">Playback</string>
+    <string name="widget_album_art">Album artwork</string>
+    <string name="widget_name">Terminus Player</string>
+    <string name="widget_description">Terminal-style playback controls and album artwork.</string>
 </resources>

@@ -5,8 +5,9 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.necroware.terminusplayer.data.prefs.AlbumArtMode
+import com.necroware.terminusplayer.data.prefs.DynamicThemeMode
 import com.necroware.terminusplayer.data.prefs.LibrarySortOrder
-import com.necroware.terminusplayer.data.prefs.PlaybackArtStyle
 import com.necroware.terminusplayer.data.prefs.SortDirection
 import com.necroware.terminusplayer.data.prefs.SortField
 import com.necroware.terminusplayer.data.prefs.ThemePresetId
@@ -46,16 +47,36 @@ class SettingsViewModel @Inject constructor(
 
     fun setTheme(id: ThemePresetId) = viewModelScope.launch { preferencesRepository.setTheme(id) }
 
+    fun setUseDynamicTheme(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setUseDynamicTheme(enabled)
+    }
+
+    fun setDynamicThemeMode(mode: DynamicThemeMode) = viewModelScope.launch {
+        preferencesRepository.setDynamicThemeMode(mode)
+    }
+
+    fun setUseCustomArtAlternatives(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setUseCustomArtAlternatives(enabled)
+    }
+
+    fun setAlbumArtMode(mode: AlbumArtMode) = viewModelScope.launch {
+        preferencesRepository.setAlbumArtMode(mode)
+    }
+
+    fun setVisualizerMode(mode: com.necroware.terminusplayer.data.prefs.VisualizerMode) = viewModelScope.launch {
+        preferencesRepository.setVisualizerMode(mode)
+    }
+
+    fun setMatrixBgEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setMatrixBgEnabled(enabled)
+    }
+
     fun setSortField(field: SortField) = viewModelScope.launch {
         preferencesRepository.setSortOrder(preferences.value.librarySortOrder.copy(field = field))
     }
 
     fun setSortDirection(direction: SortDirection) = viewModelScope.launch {
         preferencesRepository.setSortOrder(preferences.value.librarySortOrder.copy(direction = direction))
-    }
-
-    fun setPlaybackArtStyle(style: PlaybackArtStyle) = viewModelScope.launch {
-        preferencesRepository.setPlaybackArtStyle(style)
     }
 
     fun setEqualizerEnabled(enabled: Boolean) = viewModelScope.launch {
@@ -66,8 +87,28 @@ class SettingsViewModel @Inject constructor(
         preferencesRepository.setEqualizerBand(index, gainDb)
     }
 
+    fun setPreampGain(gain: Float) = viewModelScope.launch {
+        preferencesRepository.setPreampGain(gain)
+    }
+
+    fun setHighPassEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setHighPassEnabled(enabled)
+    }
+
+    fun setHighPassFreq(freq: Float) = viewModelScope.launch {
+        preferencesRepository.setHighPassFreq(freq)
+    }
+
+    fun setLowPassEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setLowPassEnabled(enabled)
+    }
+
+    fun setLowPassFreq(freq: Float) = viewModelScope.launch {
+        preferencesRepository.setLowPassFreq(freq)
+    }
+
     fun resetEqualizerBands() = viewModelScope.launch {
-        preferencesRepository.setEqualizerBands(List(5) { 0 })
+        preferencesRepository.setEqualizerBands(List(10) { 0 })
     }
 
     fun setCrossfadeEnabled(enabled: Boolean) = viewModelScope.launch {
@@ -80,6 +121,18 @@ class SettingsViewModel @Inject constructor(
 
     fun setPreferHardwareDecoder(enabled: Boolean) = viewModelScope.launch {
         preferencesRepository.setPreferHardwareDecoder(enabled)
+    }
+
+    fun setUsbExclusiveHqEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setUsbExclusiveHqEnabled(enabled)
+    }
+
+    fun setRealtimeVisualizerEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setRealtimeVisualizerEnabled(enabled)
+    }
+
+    fun setAudioMonitorEnabled(enabled: Boolean) = viewModelScope.launch {
+        preferencesRepository.setAudioMonitorEnabled(enabled)
     }
 
     fun importFiles(uris: List<Uri>) {

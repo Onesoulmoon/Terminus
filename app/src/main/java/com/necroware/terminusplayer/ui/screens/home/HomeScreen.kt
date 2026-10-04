@@ -1,6 +1,7 @@
 package com.necroware.terminusplayer.ui.screens.home
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +38,11 @@ import com.necroware.terminusplayer.data.model.Song
 import com.necroware.terminusplayer.ui.components.SongArt
 import com.necroware.terminusplayer.ui.components.SystemInfoCard
 import com.necroware.terminusplayer.ui.components.TerminalBorder
-import kotlinx.coroutines.isActive
+import com.necroware.terminusplayer.ui.components.safeTerminalInteraction
+import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
+import com.necroware.terminusplayer.util.UiFeedbackController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -43,6 +50,38 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    val uiFeedbackViewModel: com.necroware.terminusplayer.util.UiFeedbackViewModel = hiltViewModel()
+    val uiFeedbackController = uiFeedbackViewModel.controller
+
+    val recentlyPlayed = state.recentlyPlayed
+    val listSize = recentlyPlayed.size
+    val infiniteCount = if (listSize > 1) 10000 else listSize
+    val lazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = if (listSize > 1) infiniteCount / 2 else 0
+    )
+
+    if (listSize > 1) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                // Smooth continuous crawl (marquee style)
+                // MutatePriority.Default allows the user to still drag/interact
+                lazyListState.scroll(scrollPriority = MutatePriority.Default) {
+                    var lastFrameTime = withFrameNanos { it }
+                    while (true) {
+                        val nextFrameTime = withFrameNanos { it }
+                        val deltaNanos = nextFrameTime - lastFrameTime
+                        val deltaPixels = (deltaNanos / 1_000_000_000f) * 50f // 50 pixels per second
+                        scrollBy(deltaPixels)
+                        lastFrameTime = nextFrameTime
+                    }
+                }
+                // Wait briefly if interrupted by user interaction before resuming
+                delay(3000)
+            }
+        }
+    }
 
     if (state.isSyncing && state.songCount == 0) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -62,7 +101,7 @@ fun HomeScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 20.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         item {
             SystemInfoCard(
@@ -70,6 +109,15 @@ fun HomeScreen(
                 likedCount = state.likedCount,
                 weekPlays = state.weekPlays,
                 weekMsPlayed = state.weekMsPlayed,
+                topArtist = state.topArtistName,
+                metricLogText = state.dynamicMetricLog,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+        }
+
+        item {
+            com.necroware.terminusplayer.ui.components.TopVuMeterHeader(
+                audioLevel = state.audioLevel,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
@@ -78,9 +126,12 @@ fun HomeScreen(
             YourMixCard(
                 mix = state.yourMix,
                 onPlayMix = {
-                    if (state.yourMix.isNotEmpty()) {
-                        val shuffled = state.yourMix.shuffled()
-                        onSongClick(shuffled.first(), shuffled)
+                    scope.launch {
+                        val allSongs = viewModel.getAllSongs()
+                        if (allSongs.isNotEmpty()) {
+                            val shuffled = allSongs.shuffled()
+                            onSongClick(shuffled.first(), shuffled)
+                        }
                     }
                 }
             )
@@ -97,33 +148,20 @@ fun HomeScreen(
                 }
             }
             item {
-                val listState = rememberLazyListState()
-                
-                // Continuous slow scroll animation
-                LaunchedEffect(state.recentlyPlayed) {
-                    if (state.recentlyPlayed.size <= 1) return@LaunchedEffect
-                    while (isActive) {
-                        listState.scrollBy(1f) // Slow creep
-                        kotlinx.coroutines.delay(16) // ~60fps
-                        
-                        // If reached end, jump back to start (or just let it be if not looping)
-                        // For a simple "moving" effect, we can just let it scroll.
-                        // Better: auto-reset if it stops moving or reaches end.
-                        if (!listState.canScrollForward) {
-                            listState.scrollToItem(0)
-                        }
-                    }
-                }
-
                 LazyRow(
-                    state = listState,
+                    state = lazyListState,
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(state.recentlyPlayed, key = { it.id }) { song ->
+                    items(
+                        count = infiniteCount,
+                        key = { index -> index }
+                    ) { index ->
+                        val song = recentlyPlayed[index % listSize]
                         RecentlyPlayedChip(
                             song = song,
-                            onClick = { onSongClick(song, state.recentlyPlayed) }
+                            listState = lazyListState,
+                            onClick = { onSongClick(song, recentlyPlayed) }
                         )
                     }
                 }
@@ -143,49 +181,52 @@ fun HomeScreen(
 
 @Composable
 private fun YourMixCard(mix: List<Song>, onPlayMix: () -> Unit) {
+    val palette = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "> YOUR MIX_",
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                TerminalTypewriterHeader(
+                    text = "> SHUFFLE ALL",
+                    fontSize = MaterialTheme.typography.displayLarge.fontSize,
+                    color = palette.secondaryAccent,
+                    cursorColor = palette.highlightAccent
                 )
                 Text(
-                    text = if (mix.isEmpty()) {
-                        "[ listen to a few tracks to build your mix ]"
-                    } else {
-                        "[ ${mix.size} tracks · built from your listening ]"
-                    },
+                    text = "[ Shuffle and play your entire library ]",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = palette.tertiaryAccent,
+                    fontFamily = com.necroware.terminusplayer.ui.theme.TerminalFontFamily
                 )
             }
-            if (mix.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .clickable { onPlayMix() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    TerminalBorder {
-                        Text(
-                            text = "▶",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .clickable { onPlayMix() },
+                contentAlignment = Alignment.Center
+            ) {
+                TerminalBorder {
+                    Text(
+                        text = "▶",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
 
         if (mix.isNotEmpty()) {
+            Text(
+                text = "YOUR MIX PREVIEW",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 16.dp)
+            )
             LazyRow(
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(mix.take(10), key = { it.id }) { song ->
@@ -197,11 +238,11 @@ private fun YourMixCard(mix: List<Song>, onPlayMix: () -> Unit) {
 }
 
 @Composable
-private fun RecentlyPlayedChip(song: Song, onClick: () -> Unit) {
+private fun RecentlyPlayedChip(song: Song, listState: androidx.compose.foundation.lazy.LazyListState, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(120.dp)
-            .clickable { onClick() }
+            .safeTerminalInteraction(listState = listState, onClick = onClick)
     ) {
         SongArt(uriString = song.uriString, size = 120.dp)
         Text(

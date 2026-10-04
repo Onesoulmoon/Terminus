@@ -14,13 +14,14 @@ android {
         applicationId = "com.necroware.terminusplayer"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 10
+        versionName = "2.3.0"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -80,6 +81,9 @@ dependencies {
     implementation(libs.media3.common)
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.palette.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.guava)
+    implementation("net.jthink:jaudiotagger:3.0.1")
+    implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.22.6")
 }

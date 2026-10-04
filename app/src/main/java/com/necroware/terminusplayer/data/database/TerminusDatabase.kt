@@ -20,7 +20,7 @@ import com.necroware.terminusplayer.data.database.entity.SongEntity
         PlaylistEntity::class,
         PlaylistSongEntity::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class TerminusDatabase : RoomDatabase() {

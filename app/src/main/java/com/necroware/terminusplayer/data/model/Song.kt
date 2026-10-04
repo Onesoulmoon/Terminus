@@ -13,6 +13,7 @@ data class Song(
     val folderPath: String = "",
     val sizeBytes: Long = 0L,
     val dateAdded: Long = 0L,
+    val genre: String = "",
     val isLiked: Boolean = false
 )
 

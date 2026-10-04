@@ -44,10 +44,10 @@ fun Format.isLosslessFormat(): Boolean {
  * no reliable way to read from a compressed Format.
  */
 fun Format.toBitDepthLabel(): String = when (pcmEncoding) {
-    C.ENCODING_PCM_32BIT, C.ENCODING_PCM_32BIT_BIG_ENDIAN -> "32"
+    C.ENCODING_PCM_32BIT, C.ENCODING_PCM_32BIT_BIG_ENDIAN, C.ENCODING_PCM_FLOAT -> "32"
     C.ENCODING_PCM_24BIT, C.ENCODING_PCM_24BIT_BIG_ENDIAN -> "24"
     C.ENCODING_PCM_16BIT, C.ENCODING_PCM_16BIT_BIG_ENDIAN -> "16"
-    else -> "16"
+    else -> if (isLosslessFormat()) "32" else "16"
 }
 
 /** Average bitrate in kbps from the container's own Format field, or -1 if unknown. */

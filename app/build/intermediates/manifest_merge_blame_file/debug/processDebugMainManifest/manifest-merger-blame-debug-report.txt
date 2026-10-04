@@ -1,8 +1,8 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.necroware.terminusplayer"
-4    android:versionCode="1"
-5    android:versionName="0.1.0" >
+4    android:versionCode="10"
+5    android:versionName="2.3.0" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="29"
@@ -11,176 +11,289 @@
 11    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 11-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:5:5-75
 11-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:5:22-72
-12    <uses-permission
-12-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:6:5-7:38
-13        android:name="android.permission.READ_EXTERNAL_STORAGE"
-13-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:6:22-77
-14        android:maxSdkVersion="32" />
-14-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:7:9-35
-15    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-15-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:8:5-77
-15-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:8:22-74
-16    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-16-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:9:5-92
-16-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:9:22-89
-17    <uses-permission android:name="android.permission.WAKE_LOCK" />
-17-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:10:5-68
-17-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:10:22-65
-18    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-18-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:11:5-77
-18-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:11:22-74
-19    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-19-->[androidx.media3:media3-common:1.4.0] C:\Users\USER\.gradle\caches\transforms-4\d85ad0a702fe3e09faa4734563670d7b\transformed\media3-common-1.4.0\AndroidManifest.xml:22:5-79
-19-->[androidx.media3:media3-common:1.4.0] C:\Users\USER\.gradle\caches\transforms-4\d85ad0a702fe3e09faa4734563670d7b\transformed\media3-common-1.4.0\AndroidManifest.xml:22:22-76
-20
-21    <permission
-21-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
-22        android:name="com.necroware.terminusplayer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-22-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
-23        android:protectionLevel="signature" />
-23-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
-24
-25    <uses-permission android:name="com.necroware.terminusplayer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-25-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
-25-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
-26
-27    <application
-27-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:13:5-42:19
-28        android:name="com.necroware.terminusplayer.TerminusApplication"
-28-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:14:9-44
-29        android:allowBackup="true"
-29-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:15:9-35
-30        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-30-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\7d0750361d44e6af64679734d13cbc38\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
-31        android:debuggable="true"
-32        android:extractNativeLibs="false"
-33        android:icon="@mipmap/ic_launcher"
-33-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:16:9-43
-34        android:label="@string/app_name"
-34-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:17:9-41
-35        android:supportsRtl="true"
-35-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:19:9-35
-36        android:theme="@style/Theme.TerminusPlayer" >
-36-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:18:9-52
-37        <activity
-37-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:22:9-31:20
-38            android:name="com.necroware.terminusplayer.MainActivity"
-38-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:23:13-41
-39            android:exported="true"
-39-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:24:13-36
-40            android:launchMode="singleTop"
-40-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:25:13-43
-41            android:theme="@style/Theme.TerminusPlayer" >
-41-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:26:13-56
-42            <intent-filter>
-42-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:27:13-30:29
-43                <action android:name="android.intent.action.MAIN" />
-43-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:28:17-69
-43-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:28:25-66
-44
-45                <category android:name="android.intent.category.LAUNCHER" />
-45-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:29:17-77
-45-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:29:27-74
-46            </intent-filter>
-47        </activity>
-48
-49        <service
-49-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:33:9-40:19
-50            android:name="com.necroware.terminusplayer.playback.MusicService"
-50-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:34:13-50
-51            android:exported="true"
-51-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:35:13-36
-52            android:foregroundServiceType="mediaPlayback" >
-52-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:36:13-58
-53            <intent-filter>
-53-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:37:13-39:29
-54                <action android:name="androidx.media3.session.MediaSessionService" />
-54-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:38:17-86
-54-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:38:25-83
-55            </intent-filter>
-56        </service>
-57
-58        <provider
-58-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-59            android:name="androidx.startup.InitializationProvider"
-59-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-60            android:authorities="com.necroware.terminusplayer.androidx-startup"
-60-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-61            android:exported="false" >
-61-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-62            <meta-data
-62-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-63                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-63-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-64                android:value="androidx.startup" />
-64-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\446b9300106a798f8140d5906678bd8a\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-65            <meta-data
-65-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\db0f815046972f17001285a5fd6f75ea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:29:13-31:52
-66                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-66-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\db0f815046972f17001285a5fd6f75ea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:30:17-78
-67                android:value="androidx.startup" />
-67-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\db0f815046972f17001285a5fd6f75ea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:31:17-49
-68            <meta-data
-68-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-69                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-69-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
-70                android:value="androidx.startup" />
-70-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-71        </provider>
-72
-73        <activity
-73-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\fe4369801d20610f7386c9491b82600e\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-74            android:name="androidx.compose.ui.tooling.PreviewActivity"
-74-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\fe4369801d20610f7386c9491b82600e\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-75            android:exported="true" />
-75-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\fe4369801d20610f7386c9491b82600e\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-76
-77        <service
-77-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4a6547754d4e168b726999984b0f93b0\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
-78            android:name="androidx.room.MultiInstanceInvalidationService"
-78-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4a6547754d4e168b726999984b0f93b0\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
-79            android:directBootAware="true"
-79-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4a6547754d4e168b726999984b0f93b0\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
-80            android:exported="false" />
-80-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4a6547754d4e168b726999984b0f93b0\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
-81
-82        <receiver
-82-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-83            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-83-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-84            android:directBootAware="false"
-84-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-85            android:enabled="true"
-85-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-86            android:exported="true"
-86-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-87            android:permission="android.permission.DUMP" >
-87-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-88            <intent-filter>
-88-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-89                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-90            </intent-filter>
-91            <intent-filter>
-91-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-92                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-93            </intent-filter>
-94            <intent-filter>
-94-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-95                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-96            </intent-filter>
-97            <intent-filter>
-97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-98                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\5dbdf583e429741702c96febbe6b8ffa\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-99            </intent-filter>
-100        </receiver>
-101    </application>
-102
-103</manifest>
+12    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+12-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:6:5-71
+12-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:6:22-68
+13    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+13-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:7:5-80
+13-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:7:22-77
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:8:5-67
+14-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:8:22-64
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:9:5-79
+15-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:9:22-76
+16    <uses-permission
+16-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:10:5-11:38
+17        android:name="android.permission.READ_EXTERNAL_STORAGE"
+17-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:10:22-77
+18        android:maxSdkVersion="32" />
+18-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:11:9-35
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+19-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:12:5-77
+19-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:12:22-74
+20    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+20-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:13:5-92
+20-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:13:22-89
+21    <uses-permission android:name="android.permission.WAKE_LOCK" />
+21-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:14:5-68
+21-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:14:22-65
+22    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+22-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:15:5-77
+22-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:15:22-74
+23
+24    <permission
+24-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+25        android:name="com.necroware.terminusplayer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+25-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+26        android:protectionLevel="signature" />
+26-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+27
+28    <uses-permission android:name="com.necroware.terminusplayer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+28-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+28-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+29
+30    <application
+30-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:17:5-97:19
+31        android:name="com.necroware.terminusplayer.TerminusApplication"
+31-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:18:9-44
+32        android:allowBackup="true"
+32-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:19:9-35
+33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+33-->[androidx.core:core:1.13.1] C:\Users\USER\.gradle\caches\transforms-4\6357bd20de8889747bf1d9e172b53604\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+34        android:debuggable="true"
+35        android:extractNativeLibs="false"
+36        android:icon="@mipmap/ic_launcher"
+36-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:20:9-43
+37        android:label="@string/app_name"
+37-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:22:9-41
+38        android:roundIcon="@mipmap/ic_launcher_round"
+38-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:21:9-54
+39        android:supportsRtl="true"
+39-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:24:9-35
+40        android:theme="@style/Theme.TerminusPlayer" >
+40-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:23:9-52
+41        <provider
+41-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:27:9-31:50
+42            android:name="com.necroware.terminusplayer.playback.ArtworkProvider"
+42-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:28:13-53
+43            android:authorities="com.necroware.terminusplayer.artwork"
+43-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:29:13-71
+44            android:exported="true"
+44-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:30:13-36
+45            android:grantUriPermissions="true" />
+45-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:31:13-47
+46
+47        <receiver
+47-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:33:9-42:20
+48            android:name="com.necroware.terminusplayer.widget.TerminusWidgetProvider"
+48-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:34:13-58
+49            android:exported="true" >
+49-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:35:13-36
+50            <intent-filter>
+50-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:36:13-38:29
+51                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+51-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:37:17-84
+51-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:37:25-81
+52            </intent-filter>
+53
+54            <meta-data
+54-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:39:13-41:71
+55                android:name="android.appwidget.provider"
+55-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:40:17-58
+56                android:resource="@xml/terminus_player_widget_info" />
+56-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:41:17-68
+57        </receiver>
+58        <receiver
+58-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:44:9-52:20
+59            android:name="com.necroware.terminusplayer.widget.TerminusWidgetReceiver"
+59-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:45:13-58
+60            android:exported="true" >
+60-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:46:13-36
+61            <intent-filter>
+61-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:47:13-51:29
+62                <action android:name="com.necroware.terminusplayer.ACTION_TOGGLE_PLAY" />
+62-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:48:17-90
+62-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:48:25-87
+63                <action android:name="com.necroware.terminusplayer.ACTION_NEXT" />
+63-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:49:17-83
+63-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:49:25-80
+64                <action android:name="com.necroware.terminusplayer.ACTION_PREVIOUS" />
+64-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:50:17-87
+64-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:50:25-84
+65            </intent-filter>
+66        </receiver>
+67
+68        <activity
+68-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:54:9-86:20
+69            android:name="com.necroware.terminusplayer.MainActivity"
+69-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:55:13-41
+70            android:exported="true"
+70-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:56:13-36
+71            android:launchMode="singleTop"
+71-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:57:13-43
+72            android:theme="@style/Theme.TerminusPlayer" >
+72-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:58:13-56
+73            <intent-filter>
+73-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:59:13-62:29
+74                <action android:name="android.intent.action.MAIN" />
+74-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:60:17-69
+74-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:60:25-66
+75
+76                <category android:name="android.intent.category.LAUNCHER" />
+76-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:61:17-77
+76-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:61:27-74
+77            </intent-filter>
+78
+79            <!-- OS Media File Handler Intent Filter -->
+80            <intent-filter>
+80-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:65:13-79:29
+81                <action android:name="android.intent.action.VIEW" />
+81-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:66:17-69
+81-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:66:25-66
+82
+83                <category android:name="android.intent.category.DEFAULT" />
+83-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:67:17-76
+83-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:67:27-73
+84                <category android:name="android.intent.category.BROWSABLE" />
+84-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:68:17-78
+84-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:68:27-75
+85
+86                <data android:scheme="file" />
+86-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+86-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:23-44
+87                <data android:scheme="content" />
+87-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+87-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:23-44
+88
+89                <!-- Supported Audio & Video Container MIME Types -->
+90                <data android:mimeType="audio/*" />
+90-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+90-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:74:23-49
+91                <data android:mimeType="audio/mp4" />
+91-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+91-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:74:23-49
+92                <data android:mimeType="video/mp4" />
+92-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+92-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:74:23-49
+93                <data android:mimeType="application/ogg" />
+93-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+93-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:74:23-49
+94                <data android:mimeType="application/x-ogg" />
+94-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:70:17-47
+94-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:74:23-49
+95            </intent-filter>
+96
+97            <!-- Default Music Player App Recognition -->
+98            <intent-filter>
+98-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:82:13-85:29
+99                <action android:name="android.intent.action.MUSIC_PLAYER" />
+99-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:83:17-77
+99-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:83:25-74
+100
+101                <category android:name="android.intent.category.DEFAULT" />
+101-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:67:17-76
+101-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:67:27-73
+102            </intent-filter>
+103        </activity>
+104
+105        <service
+105-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:88:9-95:19
+106            android:name="com.necroware.terminusplayer.playback.MusicService"
+106-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:89:13-50
+107            android:exported="true"
+107-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:90:13-36
+108            android:foregroundServiceType="mediaPlayback" >
+108-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:91:13-58
+109            <intent-filter>
+109-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:92:13-94:29
+110                <action android:name="androidx.media3.session.MediaSessionService" />
+110-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:93:17-86
+110-->C:\Users\USER\Downloads\terminus-native\app\src\main\AndroidManifest.xml:93:25-83
+111            </intent-filter>
+112        </service>
+113
+114        <provider
+114-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+115            android:name="androidx.startup.InitializationProvider"
+115-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+116            android:authorities="com.necroware.terminusplayer.androidx-startup"
+116-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+117            android:exported="false" >
+117-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+118            <meta-data
+118-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+119                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+119-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+120                android:value="androidx.startup" />
+120-->[androidx.emoji2:emoji2:1.3.0] C:\Users\USER\.gradle\caches\transforms-4\2dab091a16a22413cbd8e0abe6eef77b\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+121            <meta-data
+121-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\b641dd432c16f6a2191afb9e8c984fea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:29:13-31:52
+122                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+122-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\b641dd432c16f6a2191afb9e8c984fea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:30:17-78
+123                android:value="androidx.startup" />
+123-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\USER\.gradle\caches\transforms-4\b641dd432c16f6a2191afb9e8c984fea\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:31:17-49
+124            <meta-data
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+125                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+126                android:value="androidx.startup" />
+126-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+127        </provider>
+128
+129        <activity
+129-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\36c4e1a0ee57f35e6cf9b78711a31b6b\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+130            android:name="androidx.compose.ui.tooling.PreviewActivity"
+130-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\36c4e1a0ee57f35e6cf9b78711a31b6b\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+131            android:exported="true" />
+131-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\USER\.gradle\caches\transforms-4\36c4e1a0ee57f35e6cf9b78711a31b6b\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+132
+133        <service
+133-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4e1043c996ad4c21054b5ae186da9986\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+134            android:name="androidx.room.MultiInstanceInvalidationService"
+134-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4e1043c996ad4c21054b5ae186da9986\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+135            android:directBootAware="true"
+135-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4e1043c996ad4c21054b5ae186da9986\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+136            android:exported="false" />
+136-->[androidx.room:room-runtime:2.6.1] C:\Users\USER\.gradle\caches\transforms-4\4e1043c996ad4c21054b5ae186da9986\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+137
+138        <receiver
+138-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+139            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+139-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+140            android:directBootAware="false"
+140-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+141            android:enabled="true"
+141-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+142            android:exported="true"
+142-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+143            android:permission="android.permission.DUMP" >
+143-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+144            <intent-filter>
+144-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+145                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+146            </intent-filter>
+147            <intent-filter>
+147-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+148                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+149            </intent-filter>
+150            <intent-filter>
+150-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+151                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+152            </intent-filter>
+153            <intent-filter>
+153-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+154                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+154-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+154-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\USER\.gradle\caches\transforms-4\e29685fddf9f21da6992cdb3c0c7c771\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+155            </intent-filter>
+156        </receiver>
+157    </application>
+158
+159</manifest>

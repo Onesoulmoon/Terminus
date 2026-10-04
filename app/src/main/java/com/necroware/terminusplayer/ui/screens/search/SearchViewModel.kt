@@ -14,9 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -42,7 +44,14 @@ class SearchViewModel @Inject constructor(
     }
 
     fun playSong(song: Song, queue: List<Song>) {
-        val index = queue.indexOfFirst { it.id == song.id }.coerceAtLeast(0)
-        playbackController.playSongs(queue.toMediaItems(), index)
+        viewModelScope.launch {
+            val masterPlaylist = repository.observeAllSongs().first()
+            if (masterPlaylist.isNotEmpty()) {
+                playbackController.playTrackFromSearch(song, masterPlaylist)
+            } else {
+                val index = queue.indexOfFirst { it.id == song.id }.coerceAtLeast(0)
+                playbackController.playSongs(queue.toMediaItems(), index)
+            }
+        }
     }
 }

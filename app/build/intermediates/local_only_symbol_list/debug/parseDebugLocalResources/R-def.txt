@@ -1,12 +1,31 @@
 R_DEF: Internal format may change without notice
 local
+color ic_launcher_background
+drawable ic_cmd_like
+drawable ic_cmd_shuffle
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable ic_terminus_status_icon
+drawable widget_art_fallback
+drawable widget_art_frame
+drawable widget_background
+drawable widget_button
 font jetbrains_mono_bold
 font jetbrains_mono_medium
 font jetbrains_mono_regular
+id widget_next_btn
+id widget_play_btn
+id widget_prev_btn
+id widget_track_title
+layout widget_terminus_player
 mipmap ic_launcher
+mipmap ic_launcher_background
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string app_name
 string playback_channel_name
+string widget_album_art
+string widget_description
+string widget_name
 style Theme.TerminusPlayer
+xml terminus_player_widget_info

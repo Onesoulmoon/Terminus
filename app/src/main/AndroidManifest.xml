@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -14,10 +18,38 @@
         android:name=".TerminusApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/Theme.TerminusPlayer"
         android:supportsRtl="true"
         tools:targetApi="34">
+
+        <provider
+            android:name=".playback.ArtworkProvider"
+            android:authorities="com.necroware.terminusplayer.artwork"
+            android:exported="true"
+            android:grantUriPermissions="true" />
+
+        <receiver
+            android:name=".widget.TerminusWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/terminus_player_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.TerminusWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.necroware.terminusplayer.ACTION_TOGGLE_PLAY" />
+                <action android:name="com.necroware.terminusplayer.ACTION_NEXT" />
+                <action android:name="com.necroware.terminusplayer.ACTION_PREVIOUS" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".MainActivity"
@@ -27,6 +59,29 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- OS Media File Handler Intent Filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+
+                <!-- Supported Audio & Video Container MIME Types -->
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="audio/mp4" />
+                <data android:mimeType="video/mp4" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+            </intent-filter>
+
+            <!-- Default Music Player App Recognition -->
+            <intent-filter>
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

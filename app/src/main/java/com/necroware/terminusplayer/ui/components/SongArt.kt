@@ -101,10 +101,16 @@ private fun SongArtFallback(size: Dp) {
 
 private suspend fun loadThumbnailSafely(context: Context, uriString: String, sizePx: Int): Bitmap? =
     withContext(Dispatchers.IO) {
+        if (uriString.isBlank()) return@withContext null
         try {
             val uri = Uri.parse(uriString)
+            // Double check it's a content URI before calling loadThumbnail
+            if (uri.scheme != "content") return@withContext null
             context.contentResolver.loadThumbnail(uri, android.util.Size(sizePx, sizePx), null)
-        } catch (_: Exception) {
+        } catch (e: SecurityException) {
+            android.util.Log.e("SongArt", "Permission denied for art: $uriString")
+            null
+        } catch (e: Exception) {
             null
         }
     }

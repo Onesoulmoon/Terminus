@@ -8,6 +8,7 @@ import androidx.room.CoroutinesRoom;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
 import androidx.room.RoomSQLiteQuery;
+import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
 import androidx.room.util.StringUtil;
@@ -38,13 +39,15 @@ public final class SongDao_Impl implements SongDao {
 
   private final EntityInsertionAdapter<SongEntity> __insertionAdapterOfSongEntity;
 
+  private final SharedSQLiteStatement __preparedStmtOfDeleteById;
+
   public SongDao_Impl(@NonNull final RoomDatabase __db) {
     this.__db = __db;
     this.__insertionAdapterOfSongEntity = new EntityInsertionAdapter<SongEntity>(__db) {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `songs` (`mediaStoreId`,`title`,`artist`,`album`,`albumId`,`duration`,`uriString`,`dateAdded`,`trackNumber`,`year`,`folderPath`,`sizeBytes`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `songs` (`mediaStoreId`,`title`,`artist`,`album`,`albumId`,`duration`,`uriString`,`dateAdded`,`trackNumber`,`year`,`folderPath`,`sizeBytes`,`genre`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -62,6 +65,15 @@ public final class SongDao_Impl implements SongDao {
         statement.bindLong(10, entity.getYear());
         statement.bindString(11, entity.getFolderPath());
         statement.bindLong(12, entity.getSizeBytes());
+        statement.bindString(13, entity.getGenre());
+      }
+    };
+    this.__preparedStmtOfDeleteById = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM songs WHERE mediaStoreId = ?";
+        return _query;
       }
     };
   }
@@ -80,6 +92,31 @@ public final class SongDao_Impl implements SongDao {
           return Unit.INSTANCE;
         } finally {
           __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deleteById(final long songId, final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfDeleteById.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, songId);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfDeleteById.release(_stmt);
         }
       }
     }, $completion);
@@ -107,6 +144,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -134,7 +172,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -178,6 +218,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -205,7 +246,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -274,6 +317,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -301,7 +345,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -341,6 +387,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -368,7 +415,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -408,6 +457,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -435,7 +485,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -504,6 +556,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -531,7 +584,77 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<SongEntity>> observeRecentlyAdded() {
+    final String _sql = "SELECT * FROM songs ORDER BY dateAdded DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"songs"}, new Callable<List<SongEntity>>() {
+      @Override
+      @NonNull
+      public List<SongEntity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfMediaStoreId = CursorUtil.getColumnIndexOrThrow(_cursor, "mediaStoreId");
+          final int _cursorIndexOfTitle = CursorUtil.getColumnIndexOrThrow(_cursor, "title");
+          final int _cursorIndexOfArtist = CursorUtil.getColumnIndexOrThrow(_cursor, "artist");
+          final int _cursorIndexOfAlbum = CursorUtil.getColumnIndexOrThrow(_cursor, "album");
+          final int _cursorIndexOfAlbumId = CursorUtil.getColumnIndexOrThrow(_cursor, "albumId");
+          final int _cursorIndexOfDuration = CursorUtil.getColumnIndexOrThrow(_cursor, "duration");
+          final int _cursorIndexOfUriString = CursorUtil.getColumnIndexOrThrow(_cursor, "uriString");
+          final int _cursorIndexOfDateAdded = CursorUtil.getColumnIndexOrThrow(_cursor, "dateAdded");
+          final int _cursorIndexOfTrackNumber = CursorUtil.getColumnIndexOrThrow(_cursor, "trackNumber");
+          final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
+          final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
+          final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
+          final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final SongEntity _item;
+            final long _tmpMediaStoreId;
+            _tmpMediaStoreId = _cursor.getLong(_cursorIndexOfMediaStoreId);
+            final String _tmpTitle;
+            _tmpTitle = _cursor.getString(_cursorIndexOfTitle);
+            final String _tmpArtist;
+            _tmpArtist = _cursor.getString(_cursorIndexOfArtist);
+            final String _tmpAlbum;
+            _tmpAlbum = _cursor.getString(_cursorIndexOfAlbum);
+            final long _tmpAlbumId;
+            _tmpAlbumId = _cursor.getLong(_cursorIndexOfAlbumId);
+            final long _tmpDuration;
+            _tmpDuration = _cursor.getLong(_cursorIndexOfDuration);
+            final String _tmpUriString;
+            _tmpUriString = _cursor.getString(_cursorIndexOfUriString);
+            final long _tmpDateAdded;
+            _tmpDateAdded = _cursor.getLong(_cursorIndexOfDateAdded);
+            final int _tmpTrackNumber;
+            _tmpTrackNumber = _cursor.getInt(_cursorIndexOfTrackNumber);
+            final int _tmpYear;
+            _tmpYear = _cursor.getInt(_cursorIndexOfYear);
+            final String _tmpFolderPath;
+            _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
+            final long _tmpSizeBytes;
+            _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;
@@ -572,6 +695,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final SongEntity _result;
           if (_cursor.moveToFirst()) {
             final long _tmpMediaStoreId;
@@ -598,7 +722,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _result = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _result = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
           } else {
             _result = null;
           }
@@ -646,6 +772,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item_1;
@@ -673,7 +800,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item_1 = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item_1 = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item_1);
           }
           return _result;
@@ -711,6 +840,7 @@ public final class SongDao_Impl implements SongDao {
           final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
           final int _cursorIndexOfFolderPath = CursorUtil.getColumnIndexOrThrow(_cursor, "folderPath");
           final int _cursorIndexOfSizeBytes = CursorUtil.getColumnIndexOrThrow(_cursor, "sizeBytes");
+          final int _cursorIndexOfGenre = CursorUtil.getColumnIndexOrThrow(_cursor, "genre");
           final List<SongEntity> _result = new ArrayList<SongEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final SongEntity _item;
@@ -738,7 +868,9 @@ public final class SongDao_Impl implements SongDao {
             _tmpFolderPath = _cursor.getString(_cursorIndexOfFolderPath);
             final long _tmpSizeBytes;
             _tmpSizeBytes = _cursor.getLong(_cursorIndexOfSizeBytes);
-            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes);
+            final String _tmpGenre;
+            _tmpGenre = _cursor.getString(_cursorIndexOfGenre);
+            _item = new SongEntity(_tmpMediaStoreId,_tmpTitle,_tmpArtist,_tmpAlbum,_tmpAlbumId,_tmpDuration,_tmpUriString,_tmpDateAdded,_tmpTrackNumber,_tmpYear,_tmpFolderPath,_tmpSizeBytes,_tmpGenre);
             _result.add(_item);
           }
           return _result;

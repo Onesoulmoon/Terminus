@@ -2,14 +2,23 @@ package com.necroware.terminusplayer.playback
 
 import android.content.ComponentName
 import android.content.Context
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.session.MediaController
+import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
-import com.google.common.util.concurrent.MoreExecutors
+import com.necroware.terminusplayer.data.model.Song
 import com.necroware.terminusplayer.util.albumIdOrNull
+import com.necroware.terminusplayer.util.toMediaItem
+import com.necroware.terminusplayer.util.toMediaItems
 import com.necroware.terminusplayer.util.bitrateKbpsOrNegative
+import com.necroware.terminusplayer.util.estimateKbpsFromSize
 import com.necroware.terminusplayer.util.isLosslessFormat
 import com.necroware.terminusplayer.util.sizeBytesOrZero
 import com.necroware.terminusplayer.util.toBitDepthLabel
@@ -44,21 +53,23 @@ data class NowPlayingState(
     val sizeBytes: Long = 0L
 )
 
-/**
- * Wraps a Media3 [MediaController] connected to [MusicService].
- * Exposes playback state as a StateFlow for Compose screens to collect.
- * Position is NOT polled continuously here — screens should poll on their
- * own coroutine while visible to avoid unnecessary background work.
- */
 @Singleton
 class PlaybackController @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
     private var controller: MediaController? = null
+    private var connecting = false
+    private val pendingCommands = ArrayDeque<MediaController.() -> Unit>()
 
     private val _state = MutableStateFlow(NowPlayingState())
     val state: StateFlow<NowPlayingState> = _state
+
+    private fun resolveKbps(format: Format?, sizeBytes: Long, durationMs: Long): Int {
+        val kbpsFromFormat = format?.bitrateKbpsOrNegative() ?: -1
+        if (kbpsFromFormat > 0) return kbpsFromFormat
+        return estimateKbpsFromSize(sizeBytes, durationMs)
+    }
 
     private val listener = object : Player.Listener {
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
@@ -77,87 +88,179 @@ class PlaybackController @Inject constructor(
             _state.value = _state.value.copy(repeatMode = repeatMode)
         }
 
-        override fun onTracksChanged(tracks: androidx.media3.common.Tracks) {
+        override fun onTracksChanged(tracks: Tracks) {
             val format = tracks.selectedAudioFormat()
+            val currentSize = _state.value.sizeBytes
+            val currentDuration = _state.value.durationMs
+            val kbps = resolveKbps(format, currentSize, currentDuration)
+
             _state.value = _state.value.copy(
                 audioFormatLabel = format?.toAudioFormatLabel() ?: "—",
                 codecLabel = format?.toCodecLabel() ?: "—",
                 sampleRateLabel = format?.toSampleRateLabel() ?: "—",
                 isLossless = format?.isLosslessFormat() ?: false,
                 bitDepthLabel = format?.toBitDepthLabel() ?: "—",
-                bitrateKbps = format?.bitrateKbpsOrNegative() ?: -1
+                bitrateKbps = kbps
             )
         }
     }
 
     fun connect(onReady: () -> Unit = {}) {
-        if (controller != null) {
+        if (controller?.isConnected == true) {
             onReady()
             return
         }
+        if (connecting) return
+        connecting = true
         val sessionToken = SessionToken(context, ComponentName(context, MusicService::class.java))
         val future = MediaController.Builder(context, sessionToken).buildAsync()
         future.addListener({
-            controller = future.get().also { it.addListener(listener) }
-            updateFromController()
-            onReady()
-        }, MoreExecutors.directExecutor())
+            try {
+                controller = future.get().also { it.addListener(listener) }
+                updateFromController()
+                val queued = pendingCommands.toList()
+                pendingCommands.clear()
+                val readyController = controller
+                if (readyController != null) {
+                    queued.forEach { command -> readyController.command() }
+                }
+                onReady()
+            } catch (e: Exception) {
+                Log.e("PlaybackController", "Failed to connect to MediaController", e)
+            } finally {
+                connecting = false
+            }
+        }, context.mainExecutor)
+    }
+
+    private fun enqueueOrRun(command: MediaController.() -> Unit) {
+        val c = controller
+        if (c?.isConnected == true) {
+            c.command()
+        } else {
+            pendingCommands.addLast(command)
+            connect()
+        }
     }
 
     fun release() {
+        pendingCommands.clear()
+        connecting = false
         controller?.removeListener(listener)
         controller?.release()
         controller = null
     }
 
-    fun playSongs(items: List<MediaItem>, startIndex: Int) {
-        controller?.apply {
-            setMediaItems(items, startIndex, 0L)
-            prepare()
-            play()
+    fun playSongs(items: List<MediaItem>, startIndex: Int) = enqueueOrRun {
+        // Enforce retaining shuffle settings safely on manual item overrides
+        val targetShuffle = shuffleModeEnabled
+        setMediaItems(items, startIndex, 0L)
+        shuffleModeEnabled = targetShuffle
+        prepare()
+        play()
+    }
+
+    fun playTrackFromSearch(searchSelectedTrack: Song, masterPlaylist: List<Song>) = enqueueOrRun {
+        // Guarantee index 0 is the exact selected track to prevent shuffle index mismatches
+        val reorderedQueue = listOf(searchSelectedTrack) + masterPlaylist.filter { it.id != searchSelectedTrack.id }
+        val targetShuffle = shuffleModeEnabled
+        setMediaItems(reorderedQueue.toMediaItems(), 0, 0L)
+        shuffleModeEnabled = targetShuffle
+        prepare()
+        play()
+    }
+
+    fun playExternalUri(uri: Uri) = enqueueOrRun {
+        setMediaItem(
+            MediaItem.Builder()
+                .setMediaId(uri.toString())
+                .setUri(uri)
+                .build()
+        )
+        prepare()
+        play()
+    }
+
+    fun skipWithCrossfade(nextTrackUri: String) = enqueueOrRun {
+        val args = Bundle().apply {
+            putString("NEXT_URI", nextTrackUri)
+        }
+        sendCustomCommand(
+            SessionCommand(AudioEngine.ACTION_CROSSFADE_NEXT, Bundle.EMPTY),
+            args
+        )
+    }
+
+    fun togglePlayPause() = enqueueOrRun {
+        if (isPlaying) pause() else play()
+    }
+
+    fun skipToNext() = enqueueOrRun { seekToNext() }
+    fun skipToPrevious() = enqueueOrRun { seekToPrevious() }
+    fun seekTo(positionMs: Long) = enqueueOrRun { seekTo(positionMs) }
+
+    fun seekForward5s() = enqueueOrRun {
+        val target = (currentPosition + 5000L).coerceAtMost(duration.coerceAtLeast(0L))
+        seekTo(target)
+    }
+
+    fun seekBackward5s() = enqueueOrRun {
+        val target = (currentPosition - 5000L).coerceAtLeast(0L)
+        seekTo(target)
+    }
+
+    fun addSongToQueue(song: Song) = enqueueOrRun {
+        addMediaItem(song.toMediaItem())
+    }
+
+    fun playSongNext(song: Song) = enqueueOrRun {
+        val nextIndex = if (mediaItemCount > 0) currentMediaItemIndex + 1 else 0
+        addMediaItem(nextIndex, song.toMediaItem())
+    }
+
+    fun toggleShuffle() = enqueueOrRun {
+        shuffleModeEnabled = !shuffleModeEnabled
+    }
+
+    fun cycleRepeatMode() = enqueueOrRun {
+        repeatMode = when (repeatMode) {
+            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_OFF
         }
     }
 
-    fun togglePlayPause() {
-        controller?.apply {
-            if (isPlaying) pause() else play()
-        }
-    }
-
-    fun skipToNext() = controller?.seekToNext()
-    fun skipToPrevious() = controller?.seekToPrevious()
-    fun seekTo(positionMs: Long) = controller?.seekTo(positionMs)
-
-    fun toggleShuffle() {
-        controller?.apply { shuffleModeEnabled = !shuffleModeEnabled }
-    }
-
-    fun cycleRepeatMode() {
-        controller?.apply {
-            repeatMode = when (repeatMode) {
-                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
-                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
-                else -> Player.REPEAT_MODE_OFF
-            }
-        }
-    }
-
-    fun currentPositionMs(): Long = controller?.currentPosition ?: 0L
-    fun durationMs(): Long = controller?.duration?.coerceAtLeast(0L) ?: 0L
+    fun currentPositionMs(): Long = if (controller?.isConnected == true) controller!!.currentPosition else 0L
+    fun durationMs(): Long = if (controller?.isConnected == true) controller!!.duration.coerceAtLeast(0L) else 0L
 
     private fun updateFromController() {
         val c = controller ?: return
+        if (!c.isConnected) return
+        
         val metadata = c.mediaMetadata
+        val currentItem = try { c.currentMediaItem } catch (e: Exception) { null }
+        val duration = try { c.duration } catch (e: Exception) { 0L }
+        val isPlaying = try { c.isPlaying } catch (e: Exception) { false }
+        val currentSize = metadata.sizeBytesOrZero()
+        val currentDuration = duration.coerceAtLeast(0L)
+
+        val resolvedKbps = if (_state.value.bitrateKbps > 0) {
+            _state.value.bitrateKbps
+        } else {
+            estimateKbpsFromSize(currentSize, currentDuration)
+        }
+
         _state.value = _state.value.copy(
-            mediaId = c.currentMediaItem?.mediaId,
+            mediaId = currentItem?.mediaId,
             title = metadata.title?.toString().orEmpty(),
             artist = metadata.artist?.toString().orEmpty(),
             album = metadata.albumTitle?.toString().orEmpty(),
             albumId = metadata.albumIdOrNull() ?: -1L,
             artworkUri = metadata.artworkUri?.toString(),
-            sizeBytes = metadata.sizeBytesOrZero(),
-            durationMs = c.duration.coerceAtLeast(0L),
-            isPlaying = c.isPlaying,
+            sizeBytes = currentSize,
+            durationMs = currentDuration,
+            bitrateKbps = resolvedKbps,
+            isPlaying = isPlaying,
             shuffleEnabled = c.shuffleModeEnabled,
             repeatMode = c.repeatMode
         )

@@ -7,6 +7,7 @@ sealed class Destination(val route: String, val label: String) {
     data object Home : Destination("home", "HOME")
     data object Library : Destination("library", "LIBRARY")
     data object Playlists : Destination("playlists", "PLAYLISTS")
+    data object Download : Destination("download", "DOWNLOAD")
     data object Stats : Destination("stats", "STATS")
     data object Settings : Destination("settings", "SETTINGS")
     data object NowPlaying : Destination("now_playing", "NOW PLAYING")
@@ -47,6 +48,7 @@ val bottomNavItems = listOf(
     Destination.Home,
     Destination.Library,
     Destination.Playlists,
+    Destination.Download,
     Destination.Stats,
     Destination.Settings
 )

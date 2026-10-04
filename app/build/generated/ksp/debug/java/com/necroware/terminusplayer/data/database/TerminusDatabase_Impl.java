@@ -45,16 +45,16 @@ public final class TerminusDatabase_Impl extends TerminusDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(3) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(5) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `songs` (`mediaStoreId` INTEGER NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `albumId` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `uriString` TEXT NOT NULL, `dateAdded` INTEGER NOT NULL, `trackNumber` INTEGER NOT NULL, `year` INTEGER NOT NULL, `folderPath` TEXT NOT NULL, `sizeBytes` INTEGER NOT NULL, PRIMARY KEY(`mediaStoreId`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `songs` (`mediaStoreId` INTEGER NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `albumId` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `uriString` TEXT NOT NULL, `dateAdded` INTEGER NOT NULL, `trackNumber` INTEGER NOT NULL, `year` INTEGER NOT NULL, `folderPath` TEXT NOT NULL, `sizeBytes` INTEGER NOT NULL, `genre` TEXT NOT NULL, PRIMARY KEY(`mediaStoreId`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `liked_songs` (`songId` INTEGER NOT NULL, `likedAt` INTEGER NOT NULL, PRIMARY KEY(`songId`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `play_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `songId` INTEGER NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `albumId` INTEGER NOT NULL, `startedAtEpochMs` INTEGER NOT NULL, `msPlayed` INTEGER NOT NULL, `completed` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `playlists` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `playlist_songs` (`playlistId` INTEGER NOT NULL, `songId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`playlistId`, `songId`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '50078e8ca6812a00f79536e45127edcd')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5267806163e6fcf4cd550fa9bec1470d')");
       }
 
       @Override
@@ -107,7 +107,7 @@ public final class TerminusDatabase_Impl extends TerminusDatabase {
       @NonNull
       public RoomOpenHelper.ValidationResult onValidateSchema(
           @NonNull final SupportSQLiteDatabase db) {
-        final HashMap<String, TableInfo.Column> _columnsSongs = new HashMap<String, TableInfo.Column>(12);
+        final HashMap<String, TableInfo.Column> _columnsSongs = new HashMap<String, TableInfo.Column>(13);
         _columnsSongs.put("mediaStoreId", new TableInfo.Column("mediaStoreId", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsSongs.put("title", new TableInfo.Column("title", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsSongs.put("artist", new TableInfo.Column("artist", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -120,6 +120,7 @@ public final class TerminusDatabase_Impl extends TerminusDatabase {
         _columnsSongs.put("year", new TableInfo.Column("year", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsSongs.put("folderPath", new TableInfo.Column("folderPath", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsSongs.put("sizeBytes", new TableInfo.Column("sizeBytes", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSongs.put("genre", new TableInfo.Column("genre", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysSongs = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesSongs = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoSongs = new TableInfo("songs", _columnsSongs, _foreignKeysSongs, _indicesSongs);
@@ -187,7 +188,7 @@ public final class TerminusDatabase_Impl extends TerminusDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "50078e8ca6812a00f79536e45127edcd", "6db099d0d8f18a61f5ae5816225bf8d1");
+    }, "5267806163e6fcf4cd550fa9bec1470d", "cc2c50c57fcada04be07524272fd4c29");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

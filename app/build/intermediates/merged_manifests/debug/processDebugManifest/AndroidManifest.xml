@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.necroware.terminusplayer"
-    android:versionCode="1"
-    android:versionName="0.1.0" >
+    android:versionCode="10"
+    android:versionName="2.3.0" >
 
     <uses-sdk
         android:minSdkVersion="29"
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -16,7 +20,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <permission
         android:name="com.necroware.terminusplayer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -32,8 +35,36 @@
         android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TerminusPlayer" >
+        <provider
+            android:name="com.necroware.terminusplayer.playback.ArtworkProvider"
+            android:authorities="com.necroware.terminusplayer.artwork"
+            android:exported="true"
+            android:grantUriPermissions="true" />
+
+        <receiver
+            android:name="com.necroware.terminusplayer.widget.TerminusWidgetProvider"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/terminus_player_widget_info" />
+        </receiver>
+        <receiver
+            android:name="com.necroware.terminusplayer.widget.TerminusWidgetReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.necroware.terminusplayer.ACTION_TOGGLE_PLAY" />
+                <action android:name="com.necroware.terminusplayer.ACTION_NEXT" />
+                <action android:name="com.necroware.terminusplayer.ACTION_PREVIOUS" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name="com.necroware.terminusplayer.MainActivity"
             android:exported="true"
@@ -43,6 +74,31 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- OS Media File Handler Intent Filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+
+                <!-- Supported Audio & Video Container MIME Types -->
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="audio/mp4" />
+                <data android:mimeType="video/mp4" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+            </intent-filter>
+
+            <!-- Default Music Player App Recognition -->
+            <intent-filter>
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

@@ -8,6 +8,7 @@ import com.necroware.terminusplayer.data.model.Song
 
 private const val EXTRA_ALBUM_ID = "com.necroware.terminusplayer.ALBUM_ID"
 private const val EXTRA_SIZE_BYTES = "com.necroware.terminusplayer.SIZE_BYTES"
+private const val ARTWORK_AUTHORITY = "com.necroware.terminusplayer.artwork"
 
 fun Song.toMediaItem(): MediaItem {
     val extras = Bundle().apply {
@@ -19,6 +20,7 @@ fun Song.toMediaItem(): MediaItem {
         .setTitle(title)
         .setArtist(artist)
         .setAlbumTitle(album)
+        .setArtworkUri(Uri.parse("content://$ARTWORK_AUTHORITY/artwork/$id"))
         .setExtras(extras)
         .build()
 

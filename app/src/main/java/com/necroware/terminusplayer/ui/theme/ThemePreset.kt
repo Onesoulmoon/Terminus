@@ -2,6 +2,7 @@ package com.necroware.terminusplayer.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import com.necroware.terminusplayer.data.prefs.ThemePresetId
+import com.necroware.terminusplayer.util.TerminalPalette
 
 /**
  * A full palette, not just an accent swap — background/surface/border/text
@@ -20,7 +21,74 @@ data class ThemePreset(
     val textMuted: Color,
     val accent: Color,
     val onAccent: Color
-)
+) {
+    val palette: TerminalPalette
+        get() = when (id) {
+            ThemePresetId.TERMINAL -> TerminalPalette(
+                primaryAccent = Color(0xFFFF9800),   // Orange
+                secondaryAccent = Color(0xFF00FFC2), // Neon Cyan
+                tertiaryAccent = Color(0xFFFFCC00),  // Gold Yellow
+                highlightAccent = Color(0xFFFFFFFF), // White
+                mutedAccent = Color(0xFF3A3A3A)      // Dark Grey Border
+            )
+            ThemePresetId.VECTOR -> TerminalPalette(
+                primaryAccent = Color(0xFFFFFFFF),   // Vector White
+                secondaryAccent = Color(0xFFAAAAAA), // Light Grey
+                tertiaryAccent = Color(0xFFCCCCCC),  // Bright Silver
+                highlightAccent = Color(0xFFFFFFFF), // White
+                mutedAccent = Color(0xFF333333)      // Dark Grey
+            )
+            ThemePresetId.REBECCA -> TerminalPalette(
+                primaryAccent = Color(0xFFFDE047),   // Yellow Accent
+                secondaryAccent = Color(0xFF22D3EE), // Cyan Secondary
+                tertiaryAccent = Color(0xFFE0FFFF),  // Light Cyan
+                highlightAccent = Color(0xFF38BDF8), // Sky Blue
+                mutedAccent = Color(0xFF1A2F2F)      // Dark Teal
+            )
+            ThemePresetId.DUNE -> TerminalPalette(
+                primaryAccent = Color(0xFFEAB308),   // Sand Gold
+                secondaryAccent = Color(0xFFCA8A04), // Warm Amber
+                tertiaryAccent = Color(0xFF44403C),  // Charcoal
+                highlightAccent = Color(0xFF1C1917), // Dark Brown Text
+                mutedAccent = Color(0xFFD6D3D1)      // Warm Stone
+            )
+            ThemePresetId.HEX -> TerminalPalette(
+                primaryAccent = Color(0xFF22C55E),   // Matrix Green
+                secondaryAccent = Color(0xFF4ADE80), // Light Green
+                tertiaryAccent = Color(0xFFDCFCE7),  // Soft Mint
+                highlightAccent = Color(0xFF16A34A), // Deep Green
+                mutedAccent = Color(0xFF14301A)      // Dark Green Border
+            )
+            ThemePresetId.LUCY -> TerminalPalette(
+                primaryAccent = Color(0xFF22D3EE),   // Cyber Cyan
+                secondaryAccent = Color(0xFFA78BFA), // Electric Violet
+                tertiaryAccent = Color(0xFFF5F3FF),  // Soft Lavender
+                highlightAccent = Color(0xFFE879F9), // Neon Pink
+                mutedAccent = Color(0xFF3B1F50)      // Deep Purple Border
+            )
+            ThemePresetId.MAINE -> TerminalPalette(
+                primaryAccent = Color(0xFF22D3EE),   // Ice Cyan
+                secondaryAccent = Color(0xFFEF4444), // Crimson Red
+                tertiaryAccent = Color(0xFFFEE2E2),  // Soft Coral
+                highlightAccent = Color(0xFFF43F5E), // Neon Coral
+                mutedAccent = Color(0xFF451010)      // Dark Crimson Border
+            )
+            ThemePresetId.FLATLINE -> TerminalPalette(
+                primaryAccent = Color(0xFFDC2626),   // Flatline Red
+                secondaryAccent = Color(0xFFF87171), // Soft Light Red
+                tertiaryAccent = Color(0xFFEF4444),  // Bright Crimson
+                highlightAccent = Color(0xFFFFFFFF), // High Contrast White
+                mutedAccent = Color(0xFF450A0A)      // Dark Red Border
+            )
+            ThemePresetId.DYNAMIC -> TerminalPalette(
+                primaryAccent = accent,
+                secondaryAccent = textSecondary,
+                tertiaryAccent = border,
+                highlightAccent = textPrimary,
+                mutedAccent = textMuted
+            )
+        }
+}
 
 val ThemePresets: List<ThemePreset> = listOf(
     ThemePreset(
@@ -125,19 +193,6 @@ val ThemePresets: List<ThemePreset> = listOf(
         textSecondary = Color(0xFFF87171),
         textMuted = Color(0xFF7F1D1D),
         accent = Color(0xFFDC2626), // Red
-        onAccent = Color(0xFF000000)
-    ),
-    ThemePreset(
-        id = ThemePresetId.WIZ,
-        label = "WIZ",
-        background = Color(0xFF000000),
-        surface = Color(0xFF0F0F05),
-        surfaceElevated = Color(0xFF1A1A0A),
-        border = Color(0xFF33330A),
-        textPrimary = Color(0xFFFDFCEA),
-        textSecondary = Color(0xFFEAB308),
-        textMuted = Color(0xFF713F12),
-        accent = Color(0xFFFACC15), // Yellow
         onAccent = Color(0xFF000000)
     )
 )

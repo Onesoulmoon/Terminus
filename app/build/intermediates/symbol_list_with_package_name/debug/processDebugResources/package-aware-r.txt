@@ -49,6 +49,7 @@ color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
 color call_notification_answer_color
 color call_notification_decline_color
+color ic_launcher_background
 color notification_action_color_filter
 color notification_icon_bg_color
 color notification_material_background_media_default_color
@@ -85,8 +86,11 @@ drawable ic_call_answer_video
 drawable ic_call_answer_video_low
 drawable ic_call_decline
 drawable ic_call_decline_low
+drawable ic_cmd_like
+drawable ic_cmd_shuffle
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable ic_terminus_status_icon
 drawable media3_icon_album
 drawable media3_icon_artist
 drawable media3_icon_block
@@ -176,6 +180,10 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable widget_art_fallback
+drawable widget_art_frame
+drawable widget_background
+drawable widget_button
 font jetbrains_mono_bold
 font jetbrains_mono_medium
 font jetbrains_mono_regular
@@ -276,6 +284,10 @@ id view_tree_on_back_pressed_dispatcher_owner
 id view_tree_saved_state_registry_owner
 id view_tree_view_model_store_owner
 id visible_removing_fragment_view_tag
+id widget_next_btn
+id widget_play_btn
+id widget_prev_btn
+id widget_track_title
 id wrapped_composition_tag
 integer cancel_button_image_alpha
 integer status_bar_notification_info_maxnum
@@ -306,7 +318,10 @@ layout notification_template_media
 layout notification_template_media_custom
 layout notification_template_part_chronometer
 layout notification_template_part_time
+layout widget_terminus_player
 mipmap ic_launcher
+mipmap ic_launcher_background
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string androidx_startup
 string app_name
@@ -427,6 +442,9 @@ string tab
 string template_percent
 string tooltip_description
 string tooltip_label
+string widget_album_art
+string widget_description
+string widget_name
 style DialogWindowTheme
 style FloatingDialogTheme
 style FloatingDialogWindowTheme
@@ -464,3 +482,4 @@ styleable NavInclude graph
 styleable Navigator android_label android_id route
 styleable StateListDrawable android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
 styleable StateListDrawableItem android_drawable
+xml terminus_player_widget_info

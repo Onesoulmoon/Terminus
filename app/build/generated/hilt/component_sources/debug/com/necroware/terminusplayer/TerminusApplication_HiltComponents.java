@@ -5,6 +5,7 @@ import com.necroware.terminusplayer.di.PreferencesModule;
 import com.necroware.terminusplayer.playback.MusicService_GeneratedInjector;
 import com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel_HiltModules;
+import com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.home.HomeViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.library.LibraryViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel_HiltModules;
@@ -13,6 +14,7 @@ import com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel_Hilt
 import com.necroware.terminusplayer.ui.screens.search.SearchViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.stats.StatsViewModel_HiltModules;
+import com.necroware.terminusplayer.util.UiFeedbackViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -180,7 +182,9 @@ public final class TerminusApplication_HiltComponents {
           SettingsViewModel_HiltModules.KeyModule.class,
           StatsViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
-          ViewModelCBuilderModule.class
+          ViewModelCBuilderModule.class,
+          UiFeedbackViewModel_HiltModules.KeyModule.class,
+          YouTubeDownloadViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -227,7 +231,9 @@ public final class TerminusApplication_HiltComponents {
           PlaylistsViewModel_HiltModules.BindsModule.class,
           SearchViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
-          StatsViewModel_HiltModules.BindsModule.class
+          StatsViewModel_HiltModules.BindsModule.class,
+          UiFeedbackViewModel_HiltModules.BindsModule.class,
+          YouTubeDownloadViewModel_HiltModules.BindsModule.class
       }
   )
   @ViewModelScoped

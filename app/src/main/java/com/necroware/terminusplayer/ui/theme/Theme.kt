@@ -1,8 +1,35 @@
 package com.necroware.terminusplayer.ui.theme
 
+import android.graphics.Bitmap
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import com.necroware.terminusplayer.util.PaletteExtractor
+import com.necroware.terminusplayer.util.TerminalPalette
+
+val LocalTerminusAccent = staticCompositionLocalOf { Color(0xFF00FFC2) }
+val LocalTerminalPalette = staticCompositionLocalOf { TerminalPalette.DefaultFallback }
+
+@Composable
+fun TerminusDynamicTheme(
+    artworkBitmap: Bitmap?,
+    content: @Composable () -> Unit
+) {
+    val dynamicPalette = remember(artworkBitmap) {
+        PaletteExtractor.generateTerminalPalette(artworkBitmap)
+    }
+
+    CompositionLocalProvider(
+        LocalTerminusAccent provides dynamicPalette.primaryAccent,
+        LocalTerminalPalette provides dynamicPalette
+    ) {
+        content()
+    }
+}
 
 /**
  * Deliberately NOT using dynamicColorScheme / Material You here — TERMINUS
@@ -32,9 +59,18 @@ fun TerminusTheme(
     preset: ThemePreset = ThemePresets.first(),
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = terminalColorScheme(preset),
-        typography = TerminusTypography,
-        content = content
-    )
+    val themePalette = remember(preset) {
+        preset.palette
+    }
+
+    CompositionLocalProvider(
+        LocalTerminusAccent provides preset.accent,
+        LocalTerminalPalette provides themePalette
+    ) {
+        MaterialTheme(
+            colorScheme = terminalColorScheme(preset),
+            typography = TerminusTypography,
+            content = content
+        )
+    }
 }

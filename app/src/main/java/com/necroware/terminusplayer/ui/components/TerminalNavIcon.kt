@@ -14,6 +14,7 @@ private fun glyphFor(destination: Destination): String = when (destination) {
     Destination.Home -> ">_"
     Destination.Library -> "[≡]"
     Destination.Playlists -> "[▤]"
+    Destination.Download -> "[↓]"
     Destination.Stats -> "[#]"
     Destination.Settings -> "[*]"
     Destination.NowPlaying -> "[▶]"

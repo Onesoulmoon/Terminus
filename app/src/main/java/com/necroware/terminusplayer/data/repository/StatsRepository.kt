@@ -6,6 +6,9 @@ import com.necroware.terminusplayer.data.database.dao.HourHistogramRow
 import com.necroware.terminusplayer.data.database.dao.PlayEventDao
 import com.necroware.terminusplayer.data.database.entity.PlayEventEntity
 import kotlinx.coroutines.flow.first
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -125,13 +128,6 @@ class StatsRepository @Inject constructor(
         )
     }
 
-    /**
-     * Groups raw plays into "sessions" using a simple gap heuristic: a new
-     * session starts whenever more than 30 minutes pass between the end of
-     * one play and the start of the next. Not a precise definition of a
-     * listening session, but a reasonable, explainable approximation from
-     * the data we actually have.
-     */
     suspend fun getSessionStats(range: StatsRange): SessionStats {
         val since = sinceEpochMsFor(range)
         val events = playEventDao.observeEventsSince(since).first().sortedBy { it.startedAtEpochMs }
@@ -162,56 +158,99 @@ class StatsRepository @Inject constructor(
     }
 
     /**
-     * A few lightweight, rule-based observations about recent listening —
-     * intentionally simple heuristics over the same play_events data, not
-     * a recommendation engine. Returns an empty list rather than forcing
-     * something when there isn't enough signal yet.
+     * Highly contextual, witty Terminus metric log messages based on listening habits.
      */
     suspend fun generateInsights(): List<String> {
         val insights = mutableListOf<String>()
         val now = System.currentTimeMillis()
         val dayMs = TimeUnit.DAYS.toMillis(1)
+        val hourMs = TimeUnit.HOURS.toMillis(1)
 
-        val weekArtists = playEventDao.topArtists(now - dayMs * 7, limit = 5)
-        val monthArtists = playEventDao.topArtists(now - dayMs * 30, limit = 10)
-
-        weekArtists.firstOrNull()?.let { top ->
-            if (top.playCount >= 5) {
-                insights += "You're a big fan of ${top.artist} this week — ${top.playCount} plays."
-            }
-        }
-
-        // "Yesterday" bucketed the same way playsByDay buckets days (UTC epoch-day),
-        // for consistency with the rest of Stats rather than local-calendar midnight.
+        val sinceWeek = now - dayMs * 7
+        val weekArtists = playEventDao.topArtists(sinceWeek, limit = 5)
         val todayDayEpoch = (now / dayMs) * dayMs
-        val yesterdayStart = todayDayEpoch - dayMs
-        val yesterdayTopSong = playEventDao.topSongForDateRange(yesterdayStart, todayDayEpoch)
-        if (yesterdayTopSong != null && yesterdayTopSong.playCount >= 3) {
-            insights += "Yesterday you listened to ${yesterdayTopSong.title} ${yesterdayTopSong.playCount}x. That's dedication."
+        val topSongToday = playEventDao.topSongsWithTitles(todayDayEpoch, limit = 1).firstOrNull()
+
+        // 1. The Single Song Loop (Played 1 song 5+ times / looped)
+        if (topSongToday != null && topSongToday.playCount >= 5) {
+            val title = topSongToday.title
+            val count = topSongToday.playCount
+            val snark = listOf(
+                "SYS_WARN // Track '$title' has been looped $count times. Geez, Is everything okay at home dude?",
+                "LOG_EVENT: Buffer lock detected on '$title'. Your dopamine receptors are officially cooked.",
+                "DIAGNOSTIC: '$title' is wearing a literal physical groove into your flash storage. Give it a rest man, common!",
+                "KERNEL_NOTICE: Audio stream '$title' active for ${count * 3}m. We get it. It’s a vibe. Now chill fahhhh...",
+                "CRITICAL_REPETITION: Playing '$title' again will trigger automatic system intervention, because what do you mean?"
+            )
+            insights += snark.random()
         }
 
-        monthArtists
-            .filter { m -> m.playCount >= 15 && weekArtists.none { w -> w.artist.equals(m.artist, ignoreCase = true) } }
-            .firstOrNull()
-            ?.let { stale ->
-                insights += "You've listened to ${stale.artist} ${stale.playCount}x this month but haven't touched them in the past week."
-            }
+        // 2. The Artist Loyalty / Binge (Played 1 artist for 3+ hours or top artist this week)
+        weekArtists.firstOrNull()?.let { top ->
+            val hours = (top.msPlayed / hourMs).coerceAtLeast(1)
+            val artist = top.artist
+            val ramPct = (30..65).random()
+            val snark = listOf(
+                "FACILITY_NOTICE: $artist now occupies $ramPct% of your remaining brain RAM. Not that you had much to begin with lol.",
+                "TELEMETRY: $hours continuous hours of $artist. We are legally required to ask if you handle the divorce well.",
+                "SYSTEM_LOG: $artist has played sooooooo long the kernel is considering charging them rent at this point.",
+                "OVERLOAD: Damn dude, You’ve listened to $artist more than their own mother has this week.",
+                "ALERT: $artist stream duration exceeded. The DAC is sweating."
+            )
+            insights += snark.random()
+        }
 
-        return insights
+        // 3. Night Shift / Degenerate Hours (Listening between 2 AM – 5 AM)
+        val cal = Calendar.getInstance()
+        val hour = cal.get(Calendar.HOUR_OF_DAY)
+        if (hour in 2..5) {
+            val lastTracks = playEventDao.topSongsWithTitles(now - hourMs, limit = 1)
+            val currentTrack = lastTracks.firstOrNull()?.title ?: "Turban"
+            val artistName = weekArtists.firstOrNull()?.artist ?: "Yeat"
+            val timeStr = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(cal.time)
+            val snark = listOf(
+                "TIME_STAMP [$timeStr]: Playing '$currentTrack' right now strongly points to a circadian system failure. And unemployment...",
+                "NIGHT_SHIFT_LOG: No one listens to $artistName at $timeStr for healthy reasons.",
+                "KERNEL_DIAGNOSTIC: Sleep.exe not found. Defaulting to '$currentTrack' loop.",
+                "SYS_ALERT: Sun rises in 2 hours. Your choice of $artistName is not helping at all."
+            )
+            insights += snark.random()
+        }
+
+        // 4. Major Lifetime Milestones (50h / 100h / 500h total on an Artist)
+        val topAllTime = playEventDao.topArtists(0L, limit = 5)
+        val totalMsAllTime = playEventDao.totalMsPlayed(0L).coerceAtLeast(1L)
+        topAllTime.forEach { artist ->
+            val totalHours = artist.msPlayed / hourMs
+            val pct = ((artist.msPlayed.toDouble() / totalMsAllTime) * 100).toInt().coerceIn(1, 99)
+            when {
+                totalHours >= 500 -> insights += "FILE_CORRUPTION: Local storage renamed to '${artist.artist}_DEDICATED_SERVER'."
+                totalHours >= 100 -> insights += "CENTURY_MARK: 100 hours of ${artist.artist} logged. System kernel has officially converted to their cult."
+                totalHours >= 50 -> insights += "ACHIEVEMENT_UNLOCKED: 50 Hours of ${artist.artist}. You are officially on their emergency contact list."
+                totalHours >= 10 -> insights += "STATUS_UPDATE: You have spent $pct% of your entire year listening to ${artist.artist}. No regrets detected."
+            }
+        }
+
+        if (insights.isEmpty()) {
+            weekArtists.firstOrNull()?.let { top ->
+                insights += "METRIC // TOP_ARTIST: '${top.artist}' leading the log tracking matrix index with ${top.playCount} recorded playback cycles this week."
+            } ?: run {
+                insights += "METRIC // TOP_ARTIST: 'Yeat' leading the log tracking matrix index with 9 recorded playback cycles this week."
+            }
+        }
+
+        return insights.distinct()
     }
 
     private fun sinceEpochMsFor(range: StatsRange): Long {
         val now = System.currentTimeMillis()
         return when (range) {
-            // Local midnight, NOT "last 24 hours" — a rolling window never
-            // resets, which reads as wrong for something literally called
-            // "Today". Week/Month/Year stay rolling windows for now.
             StatsRange.TODAY -> {
-                val cal = java.util.Calendar.getInstance()
-                cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                cal.set(java.util.Calendar.MINUTE, 0)
-                cal.set(java.util.Calendar.SECOND, 0)
-                cal.set(java.util.Calendar.MILLISECOND, 0)
+                val cal = Calendar.getInstance()
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
                 cal.timeInMillis
             }
             StatsRange.WEEK -> now - TimeUnit.DAYS.toMillis(7)

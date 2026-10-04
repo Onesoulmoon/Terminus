@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -58,6 +59,7 @@ class PlaylistDetailViewModel @Inject constructor(
                     PlaylistKind.LIKED -> repository.getLikedSongs()
                     PlaylistKind.RECENT -> repository.getRecentlyPlayed(limit = 100)
                     PlaylistKind.MOST_PLAYED -> repository.getMostPlayed(limit = 100)
+                    PlaylistKind.RECENTLY_ADDED -> repository.observeRecentlyAdded().first()
                 }
                 _uiState.value = PlaylistDetailUiState(
                     isLoading = false,
@@ -67,6 +69,7 @@ class PlaylistDetailViewModel @Inject constructor(
                         PlaylistKind.LIKED -> "[ nothing liked yet — tap the heart on Now Playing ]"
                         PlaylistKind.RECENT -> "[ nothing played yet ]"
                         PlaylistKind.MOST_PLAYED -> "[ nothing played yet ]"
+                        PlaylistKind.RECENTLY_ADDED -> "[ library is empty ]"
                     },
                     songs = songs
                 )

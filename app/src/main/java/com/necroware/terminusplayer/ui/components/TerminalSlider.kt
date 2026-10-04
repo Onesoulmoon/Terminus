@@ -1,19 +1,21 @@
 package com.necroware.terminusplayer.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -32,10 +34,10 @@ fun TerminalSlider(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     segmentCount: Int = 20,
-    originFraction: Float? = null
+    originFraction: Float? = null,
 ) {
     val clamped = value.coerceIn(0f, 1f)
-    var barWidthPx by remember { mutableStateOf(1f) }
+    var barWidthPx by remember { mutableFloatStateOf(1f) }
 
     fun updateFromOffsetX(x: Float) {
         onValueChange((x / barWidthPx).coerceIn(0f, 1f))
@@ -47,7 +49,7 @@ fun TerminalSlider(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(18.dp)
+            .height(20.dp)
             .onSizeChanged { barWidthPx = it.width.toFloat().coerceAtLeast(1f) }
             .pointerInput(Unit) {
                 detectTapGestures { offset -> updateFromOffsetX(offset.x) }
@@ -55,10 +57,10 @@ fun TerminalSlider(
             .pointerInput(Unit) {
                 detectDragGestures { change, _ -> updateFromOffsetX(change.position.x) }
             },
-        horizontalArrangement = Arrangement.spacedBy(2.dp)
+        horizontalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         repeat(segmentCount) { index ->
-            val isFilled = if (originSegment != null && originFraction != null) {
+            val isFilled = if (originSegment != null) {
                 if (clamped >= originFraction) index in originSegment..filledSegments.coerceAtLeast(originSegment)
                 else index in filledSegments.coerceAtMost(originSegment)..originSegment
             } else {
@@ -67,12 +69,16 @@ fun TerminalSlider(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .height(if (originSegment == index) 18.dp else 12.dp)
-                    .background(
-                        if (isFilled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-                    )
-            )
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (isFilled) "█" else "░",
+                    color = if (isFilled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    style = if (originSegment == index) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }
+

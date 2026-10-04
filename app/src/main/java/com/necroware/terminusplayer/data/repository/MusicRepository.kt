@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import java.io.File
 import com.necroware.terminusplayer.data.database.dao.LikedSongDao
 import com.necroware.terminusplayer.data.database.dao.PlayEventDao
 import com.necroware.terminusplayer.data.database.dao.PlaylistDao
@@ -83,8 +84,52 @@ class MusicRepository @Inject constructor(
 
     fun observeAllFolders(): Flow<List<String>> = songDao.observeAllFolders()
 
+    fun observeRecentlyAdded(): Flow<List<Song>> =
+        combine(songDao.observeRecentlyAdded(), likedSongDao.observeLikedIds()) { songs, likedIds ->
+            val likedSet = likedIds.toHashSet()
+            songs.map { it.toSong(isLiked = it.mediaStoreId in likedSet) }
+        }
+
     fun searchSongs(query: String): Flow<List<Song>> =
         songDao.searchSongs(query).map { entities -> entities.map { it.toSong() } }
+
+    /**
+     * Direct deletion path for Android versions where MediaStore allows it.
+     * Android 11+ generally requires a user-confirmed delete request for
+     * media that the app does not own, so the UI handles that flow separately.
+     */
+    suspend fun deleteSongDirect(song: Song): Boolean = withContext(Dispatchers.IO) {
+        val uri = Uri.parse(song.uriString)
+        val deleted = try {
+            context.contentResolver.delete(uri, null, null) > 0
+        } catch (_: SecurityException) {
+            false
+        } catch (_: IllegalArgumentException) {
+            false
+        }
+        if (deleted) removeSongFromCacheInternal(song)
+        deleted
+    }
+
+    /** Removes a successfully deleted media item from Terminus' Room cache. */
+    suspend fun removeSongFromCache(song: Song) = withContext(Dispatchers.IO) {
+        removeSongFromCacheInternal(song)
+    }
+
+    private suspend fun removeSongFromCacheInternal(song: Song) {
+        songDao.deleteById(song.id)
+        likedSongDao.unlike(song.id)
+    }
+
+    /** Builds the system confirmation request used by Android 11+ MediaStore. */
+    fun createDeleteRequest(song: Song): android.content.IntentSender? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        val intent = MediaStore.createDeleteRequest(
+            context.contentResolver,
+            listOf(Uri.parse(song.uriString))
+        )
+        return intent.intentSender
+    }
 
     suspend fun toggleLike(songId: Long) {
         if (likedSongDao.isLiked(songId)) {
@@ -278,6 +323,27 @@ class MusicRepository @Inject constructor(
         successCount
     }
 
+    suspend fun importDownloadedFile(file: File): Boolean = withContext(Dispatchers.IO) {
+        val resolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
+            put(MediaStore.Audio.Media.TITLE, file.nameWithoutExtension.replace("_", " "))
+            put(MediaStore.Audio.Media.ARTIST, "Terminus Download")
+            put(MediaStore.Audio.Media.ALBUM, "Download Vault")
+            put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+            put(MediaStore.Audio.Media.DATA, file.absolutePath)
+            put(MediaStore.Audio.Media.IS_MUSIC, 1)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Terminus")
+            }
+        }
+        try {
+            resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values)
+        } catch (_: Exception) {}
+        syncLibrary()
+        true
+    }
+
     private fun queryDisplayName(uri: Uri): String? {
         val projection = arrayOf(android.provider.OpenableColumns.DISPLAY_NAME)
         context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
@@ -303,5 +369,6 @@ private fun SongEntity.toSong(isLiked: Boolean = false): Song = Song(
     folderPath = folderPath,
     sizeBytes = sizeBytes,
     dateAdded = dateAdded,
+    genre = genre,
     isLiked = isLiked
 )

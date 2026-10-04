@@ -30,19 +30,29 @@ public final class MusicService_MembersInjector implements MembersInjector<Music
 
   private final Provider<MusicRepository> musicRepositoryProvider;
 
+  private final Provider<AudioVisualizerHelper> visualizerHelperProvider;
+
+  private final Provider<UsbDacManager> usbDacManagerProvider;
+
   public MusicService_MembersInjector(Provider<StatsRepository> statsRepositoryProvider,
       Provider<UserPreferencesRepository> preferencesRepositoryProvider,
-      Provider<MusicRepository> musicRepositoryProvider) {
+      Provider<MusicRepository> musicRepositoryProvider,
+      Provider<AudioVisualizerHelper> visualizerHelperProvider,
+      Provider<UsbDacManager> usbDacManagerProvider) {
     this.statsRepositoryProvider = statsRepositoryProvider;
     this.preferencesRepositoryProvider = preferencesRepositoryProvider;
     this.musicRepositoryProvider = musicRepositoryProvider;
+    this.visualizerHelperProvider = visualizerHelperProvider;
+    this.usbDacManagerProvider = usbDacManagerProvider;
   }
 
   public static MembersInjector<MusicService> create(
       Provider<StatsRepository> statsRepositoryProvider,
       Provider<UserPreferencesRepository> preferencesRepositoryProvider,
-      Provider<MusicRepository> musicRepositoryProvider) {
-    return new MusicService_MembersInjector(statsRepositoryProvider, preferencesRepositoryProvider, musicRepositoryProvider);
+      Provider<MusicRepository> musicRepositoryProvider,
+      Provider<AudioVisualizerHelper> visualizerHelperProvider,
+      Provider<UsbDacManager> usbDacManagerProvider) {
+    return new MusicService_MembersInjector(statsRepositoryProvider, preferencesRepositoryProvider, musicRepositoryProvider, visualizerHelperProvider, usbDacManagerProvider);
   }
 
   @Override
@@ -50,6 +60,8 @@ public final class MusicService_MembersInjector implements MembersInjector<Music
     injectStatsRepository(instance, statsRepositoryProvider.get());
     injectPreferencesRepository(instance, preferencesRepositoryProvider.get());
     injectMusicRepository(instance, musicRepositoryProvider.get());
+    injectVisualizerHelper(instance, visualizerHelperProvider.get());
+    injectUsbDacManager(instance, usbDacManagerProvider.get());
   }
 
   @InjectedFieldSignature("com.necroware.terminusplayer.playback.MusicService.statsRepository")
@@ -66,5 +78,16 @@ public final class MusicService_MembersInjector implements MembersInjector<Music
   @InjectedFieldSignature("com.necroware.terminusplayer.playback.MusicService.musicRepository")
   public static void injectMusicRepository(MusicService instance, MusicRepository musicRepository) {
     instance.musicRepository = musicRepository;
+  }
+
+  @InjectedFieldSignature("com.necroware.terminusplayer.playback.MusicService.visualizerHelper")
+  public static void injectVisualizerHelper(MusicService instance,
+      AudioVisualizerHelper visualizerHelper) {
+    instance.visualizerHelper = visualizerHelper;
+  }
+
+  @InjectedFieldSignature("com.necroware.terminusplayer.playback.MusicService.usbDacManager")
+  public static void injectUsbDacManager(MusicService instance, UsbDacManager usbDacManager) {
+    instance.usbDacManager = usbDacManager;
   }
 }

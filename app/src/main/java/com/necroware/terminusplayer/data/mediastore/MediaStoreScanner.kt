@@ -2,6 +2,7 @@ package com.necroware.terminusplayer.data.mediastore
 
 import android.content.ContentUris
 import android.content.Context
+import android.os.Build
 import android.provider.MediaStore
 import com.necroware.terminusplayer.data.database.entity.SongEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,8 +37,12 @@ class MediaStoreScanner @Inject constructor(
             MediaStore.Audio.Media.TRACK,
             MediaStore.Audio.Media.YEAR,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.SIZE
-        )
+            MediaStore.Audio.Media.SIZE,
+        ).toMutableList().apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                add(MediaStore.Audio.Media.GENRE)
+            }
+        }.toTypedArray()
 
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
 
@@ -59,12 +64,16 @@ class MediaStoreScanner @Inject constructor(
             val yearCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
             val dataCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+            val genreCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                cursor.getColumnIndex(MediaStore.Audio.Media.GENRE)
+            } else -1
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
                 val path = cursor.getString(dataCol) ?: ""
                 val folderPath = File(path).parent ?: ""
                 val contentUri = ContentUris.withAppendedId(collection, id)
+                val genre = if (genreCol != -1) cursor.getString(genreCol) ?: "Unknown" else "Unknown"
 
                 songs += SongEntity(
                     mediaStoreId = id,
@@ -78,7 +87,8 @@ class MediaStoreScanner @Inject constructor(
                     trackNumber = cursor.getInt(trackCol) % 1000,
                     year = cursor.getInt(yearCol),
                     folderPath = folderPath,
-                    sizeBytes = cursor.getLong(sizeCol)
+                    sizeBytes = cursor.getLong(sizeCol),
+                    genre = genre
                 )
             }
         }

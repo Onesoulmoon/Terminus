@@ -40,6 +40,9 @@ interface SongDao {
     @Query("SELECT * FROM songs WHERE folderPath = :folderPath ORDER BY title ASC")
     fun observeSongsByFolder(folderPath: String): Flow<List<SongEntity>>
 
+    @Query("SELECT * FROM songs ORDER BY dateAdded DESC")
+    fun observeRecentlyAdded(): Flow<List<SongEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(songs: List<SongEntity>)
 
@@ -57,4 +60,7 @@ interface SongDao {
 
     @Query("SELECT COUNT(*) FROM songs")
     suspend fun count(): Int
+
+    @androidx.room.Query("DELETE FROM songs WHERE mediaStoreId = :songId")
+    suspend fun deleteById(songId: Long)
 }

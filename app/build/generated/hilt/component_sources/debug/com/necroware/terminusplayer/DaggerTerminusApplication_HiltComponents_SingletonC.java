@@ -17,22 +17,29 @@ import com.necroware.terminusplayer.data.database.dao.PlayEventDao;
 import com.necroware.terminusplayer.data.database.dao.PlaylistDao;
 import com.necroware.terminusplayer.data.database.dao.SongDao;
 import com.necroware.terminusplayer.data.mediastore.MediaStoreScanner;
+import com.necroware.terminusplayer.data.network.DownloadEngine;
+import com.necroware.terminusplayer.data.network.YouTubeNetRepository;
 import com.necroware.terminusplayer.data.prefs.UserPreferencesRepository;
 import com.necroware.terminusplayer.data.repository.MusicRepository;
 import com.necroware.terminusplayer.data.repository.StatsRepository;
+import com.necroware.terminusplayer.data.repository.TrackMetadataRepository;
 import com.necroware.terminusplayer.di.DatabaseModule_ProvideDatabaseFactory;
 import com.necroware.terminusplayer.di.DatabaseModule_ProvideLikedSongDaoFactory;
 import com.necroware.terminusplayer.di.DatabaseModule_ProvidePlayEventDaoFactory;
 import com.necroware.terminusplayer.di.DatabaseModule_ProvidePlaylistDaoFactory;
 import com.necroware.terminusplayer.di.DatabaseModule_ProvideSongDaoFactory;
 import com.necroware.terminusplayer.di.PreferencesModule_ProvideDataStoreFactory;
+import com.necroware.terminusplayer.playback.AudioVisualizerHelper;
 import com.necroware.terminusplayer.playback.MusicService;
 import com.necroware.terminusplayer.playback.MusicService_MembersInjector;
 import com.necroware.terminusplayer.playback.PlaybackController;
+import com.necroware.terminusplayer.playback.UsbDacManager;
 import com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel;
 import com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel;
 import com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel_HiltModules;
+import com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel;
+import com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.home.HomeViewModel;
 import com.necroware.terminusplayer.ui.screens.home.HomeViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.library.LibraryViewModel;
@@ -49,6 +56,9 @@ import com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel;
 import com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel_HiltModules;
 import com.necroware.terminusplayer.ui.screens.stats.StatsViewModel;
 import com.necroware.terminusplayer.ui.screens.stats.StatsViewModel_HiltModules;
+import com.necroware.terminusplayer.util.UiFeedbackController;
+import com.necroware.terminusplayer.util.UiFeedbackViewModel;
+import com.necroware.terminusplayer.util.UiFeedbackViewModel_HiltModules;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -407,7 +417,7 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return LazyClassKeyMap.<Boolean>of(ImmutableMap.<String, Boolean>builderWithExpectedSize(11).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel, AlbumDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel, ArtistDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_home_HomeViewModel, HomeViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_library_LibraryViewModel, LibraryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_MainActivityViewModel, MainActivityViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel, PlaybackViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel, PlaylistDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel, PlaylistsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_search_SearchViewModel, SearchViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel, SettingsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_stats_StatsViewModel, StatsViewModel_HiltModules.KeyModule.provide()).build());
+      return LazyClassKeyMap.<Boolean>of(ImmutableMap.<String, Boolean>builderWithExpectedSize(13).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel, AlbumDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel, ArtistDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_home_HomeViewModel, HomeViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_library_LibraryViewModel, LibraryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_MainActivityViewModel, MainActivityViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel, PlaybackViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel, PlaylistDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel, PlaylistsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_search_SearchViewModel, SearchViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel, SettingsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_stats_StatsViewModel, StatsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_util_UiFeedbackViewModel, UiFeedbackViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel, YouTubeDownloadViewModel_HiltModules.KeyModule.provide()).build());
     }
 
     @Override
@@ -427,60 +437,70 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
-
-      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
-
       static String com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel = "com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
+      static String com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel = "com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
 
+      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
+
       static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel";
 
-      @KeepFieldType
-      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
 
-      @KeepFieldType
-      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
 
-      @KeepFieldType
-      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
 
-      @KeepFieldType
-      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
+      static String com_necroware_terminusplayer_util_UiFeedbackViewModel = "com.necroware.terminusplayer.util.UiFeedbackViewModel";
 
-      @KeepFieldType
-      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
+
+      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
 
       @KeepFieldType
       SettingsViewModel com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel2;
 
       @KeepFieldType
-      AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
-
-      @KeepFieldType
-      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
-
-      @KeepFieldType
-      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
+      YouTubeDownloadViewModel com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel2;
 
       @KeepFieldType
       PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
 
       @KeepFieldType
+      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
+
+      @KeepFieldType
       PlaylistDetailViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel2;
+
+      @KeepFieldType
+      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
+
+      @KeepFieldType
+      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
+
+      @KeepFieldType
+      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
+
+      @KeepFieldType
+      UiFeedbackViewModel com_necroware_terminusplayer_util_UiFeedbackViewModel2;
+
+      @KeepFieldType
+      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
+
+      @KeepFieldType
+      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
+
+      @KeepFieldType
+      AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
+
+      @KeepFieldType
+      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
     }
   }
 
@@ -515,6 +535,10 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     private Provider<StatsViewModel> statsViewModelProvider;
 
+    private Provider<UiFeedbackViewModel> uiFeedbackViewModelProvider;
+
+    private Provider<YouTubeDownloadViewModel> youTubeDownloadViewModelProvider;
+
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
         ActivityRetainedCImpl activityRetainedCImpl, SavedStateHandle savedStateHandleParam,
         ViewModelLifecycle viewModelLifecycleParam) {
@@ -539,11 +563,13 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       this.searchViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
       this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
       this.statsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.uiFeedbackViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
+      this.youTubeDownloadViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 12);
     }
 
     @Override
     public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(11).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel, ((Provider) albumDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel, ((Provider) artistDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_home_HomeViewModel, ((Provider) homeViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_library_LibraryViewModel, ((Provider) libraryViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_MainActivityViewModel, ((Provider) mainActivityViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel, ((Provider) playbackViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel, ((Provider) playlistDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel, ((Provider) playlistsViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_search_SearchViewModel, ((Provider) searchViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel, ((Provider) settingsViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_stats_StatsViewModel, ((Provider) statsViewModelProvider)).build());
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(13).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel, ((Provider) albumDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel, ((Provider) artistDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_home_HomeViewModel, ((Provider) homeViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_library_LibraryViewModel, ((Provider) libraryViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_MainActivityViewModel, ((Provider) mainActivityViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel, ((Provider) playbackViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel, ((Provider) playlistDetailViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel, ((Provider) playlistsViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_search_SearchViewModel, ((Provider) searchViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel, ((Provider) settingsViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_stats_StatsViewModel, ((Provider) statsViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_util_UiFeedbackViewModel, ((Provider) uiFeedbackViewModelProvider)).put(LazyClassKeyProvider.com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel, ((Provider) youTubeDownloadViewModelProvider)).build());
     }
 
     @Override
@@ -553,36 +579,40 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
+      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
+      static String com_necroware_terminusplayer_util_UiFeedbackViewModel = "com.necroware.terminusplayer.util.UiFeedbackViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel = "com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
+      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
+      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
+      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
+      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel = "com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel";
 
       @KeepFieldType
-      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
+      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
 
       @KeepFieldType
       StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
 
       @KeepFieldType
-      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
+      UiFeedbackViewModel com_necroware_terminusplayer_util_UiFeedbackViewModel2;
 
       @KeepFieldType
       SettingsViewModel com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel2;
@@ -591,22 +621,28 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
 
       @KeepFieldType
-      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
+      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
 
       @KeepFieldType
       PlaylistDetailViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel2;
 
       @KeepFieldType
-      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
+      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
+
+      @KeepFieldType
+      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
 
       @KeepFieldType
       AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
 
       @KeepFieldType
-      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
+      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
 
       @KeepFieldType
-      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
+      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
+
+      @KeepFieldType
+      YouTubeDownloadViewModel com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -637,16 +673,16 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
           return (T) new ArtistDetailViewModel(viewModelCImpl.savedStateHandle, singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.statsRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get());
 
           case 2: // com.necroware.terminusplayer.ui.screens.home.HomeViewModel 
-          return (T) new HomeViewModel(singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.statsRepositoryProvider.get());
+          return (T) new HomeViewModel(singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.statsRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get(), singletonCImpl.audioVisualizerHelperProvider.get());
 
           case 3: // com.necroware.terminusplayer.ui.screens.library.LibraryViewModel 
-          return (T) new LibraryViewModel(singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.userPreferencesRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get());
+          return (T) new LibraryViewModel(singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.userPreferencesRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get(), singletonCImpl.uiFeedbackControllerProvider.get());
 
           case 4: // com.necroware.terminusplayer.MainActivityViewModel 
-          return (T) new MainActivityViewModel(singletonCImpl.userPreferencesRepositoryProvider.get());
+          return (T) new MainActivityViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.userPreferencesRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get());
 
           case 5: // com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel 
-          return (T) new PlaybackViewModel(singletonCImpl.playbackControllerProvider.get(), singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.userPreferencesRepositoryProvider.get());
+          return (T) new PlaybackViewModel(singletonCImpl.playbackControllerProvider.get(), singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.trackMetadataRepositoryProvider.get(), singletonCImpl.userPreferencesRepositoryProvider.get(), singletonCImpl.audioVisualizerHelperProvider.get());
 
           case 6: // com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel 
           return (T) new PlaylistDetailViewModel(viewModelCImpl.savedStateHandle, singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get());
@@ -662,6 +698,12 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
           case 10: // com.necroware.terminusplayer.ui.screens.stats.StatsViewModel 
           return (T) new StatsViewModel(singletonCImpl.statsRepositoryProvider.get());
+
+          case 11: // com.necroware.terminusplayer.util.UiFeedbackViewModel 
+          return (T) new UiFeedbackViewModel(singletonCImpl.uiFeedbackControllerProvider.get());
+
+          case 12: // com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel 
+          return (T) new YouTubeDownloadViewModel(singletonCImpl.youTubeNetRepositoryProvider.get(), singletonCImpl.downloadEngineProvider.get(), singletonCImpl.musicRepositoryProvider.get(), singletonCImpl.playbackControllerProvider.get());
 
           default: throw new AssertionError(id);
         }
@@ -747,6 +789,8 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       MusicService_MembersInjector.injectStatsRepository(instance, singletonCImpl.statsRepositoryProvider.get());
       MusicService_MembersInjector.injectPreferencesRepository(instance, singletonCImpl.userPreferencesRepositoryProvider.get());
       MusicService_MembersInjector.injectMusicRepository(instance, singletonCImpl.musicRepositoryProvider.get());
+      MusicService_MembersInjector.injectVisualizerHelper(instance, singletonCImpl.audioVisualizerHelperProvider.get());
+      MusicService_MembersInjector.injectUsbDacManager(instance, singletonCImpl.usbDacManagerProvider.get());
       return instance;
     }
   }
@@ -766,9 +810,21 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     private Provider<PlaybackController> playbackControllerProvider;
 
+    private Provider<AudioVisualizerHelper> audioVisualizerHelperProvider;
+
     private Provider<DataStore<Preferences>> provideDataStoreProvider;
 
     private Provider<UserPreferencesRepository> userPreferencesRepositoryProvider;
+
+    private Provider<UiFeedbackController> uiFeedbackControllerProvider;
+
+    private Provider<TrackMetadataRepository> trackMetadataRepositoryProvider;
+
+    private Provider<YouTubeNetRepository> youTubeNetRepositoryProvider;
+
+    private Provider<DownloadEngine> downloadEngineProvider;
+
+    private Provider<UsbDacManager> usbDacManagerProvider;
 
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
@@ -799,8 +855,14 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       this.musicRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<MusicRepository>(singletonCImpl, 0));
       this.statsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<StatsRepository>(singletonCImpl, 3));
       this.playbackControllerProvider = DoubleCheck.provider(new SwitchingProvider<PlaybackController>(singletonCImpl, 4));
-      this.provideDataStoreProvider = DoubleCheck.provider(new SwitchingProvider<DataStore<Preferences>>(singletonCImpl, 6));
-      this.userPreferencesRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserPreferencesRepository>(singletonCImpl, 5));
+      this.audioVisualizerHelperProvider = DoubleCheck.provider(new SwitchingProvider<AudioVisualizerHelper>(singletonCImpl, 5));
+      this.provideDataStoreProvider = DoubleCheck.provider(new SwitchingProvider<DataStore<Preferences>>(singletonCImpl, 7));
+      this.userPreferencesRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserPreferencesRepository>(singletonCImpl, 6));
+      this.uiFeedbackControllerProvider = DoubleCheck.provider(new SwitchingProvider<UiFeedbackController>(singletonCImpl, 8));
+      this.trackMetadataRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<TrackMetadataRepository>(singletonCImpl, 9));
+      this.youTubeNetRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<YouTubeNetRepository>(singletonCImpl, 10));
+      this.downloadEngineProvider = DoubleCheck.provider(new SwitchingProvider<DownloadEngine>(singletonCImpl, 11));
+      this.usbDacManagerProvider = DoubleCheck.provider(new SwitchingProvider<UsbDacManager>(singletonCImpl, 12));
     }
 
     @Override
@@ -851,11 +913,29 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
           case 4: // com.necroware.terminusplayer.playback.PlaybackController 
           return (T) new PlaybackController(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 5: // com.necroware.terminusplayer.data.prefs.UserPreferencesRepository 
+          case 5: // com.necroware.terminusplayer.playback.AudioVisualizerHelper 
+          return (T) new AudioVisualizerHelper();
+
+          case 6: // com.necroware.terminusplayer.data.prefs.UserPreferencesRepository 
           return (T) new UserPreferencesRepository(singletonCImpl.provideDataStoreProvider.get());
 
-          case 6: // androidx.datastore.core.DataStore<androidx.datastore.preferences.core.Preferences> 
+          case 7: // androidx.datastore.core.DataStore<androidx.datastore.preferences.core.Preferences> 
           return (T) PreferencesModule_ProvideDataStoreFactory.provideDataStore(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 8: // com.necroware.terminusplayer.util.UiFeedbackController 
+          return (T) new UiFeedbackController();
+
+          case 9: // com.necroware.terminusplayer.data.repository.TrackMetadataRepository 
+          return (T) new TrackMetadataRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 10: // com.necroware.terminusplayer.data.network.YouTubeNetRepository 
+          return (T) new YouTubeNetRepository();
+
+          case 11: // com.necroware.terminusplayer.data.network.DownloadEngine 
+          return (T) new DownloadEngine(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.musicRepositoryProvider.get());
+
+          case 12: // com.necroware.terminusplayer.playback.UsbDacManager 
+          return (T) new UsbDacManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);
         }

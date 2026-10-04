@@ -15,10 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.necroware.terminusplayer.ui.components.TerminalBorder
+import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
+import com.necroware.terminusplayer.ui.theme.LocalTerminalPalette
+import com.necroware.terminusplayer.ui.theme.TerminalFontFamily
 
 @Composable
 fun PlaylistsScreen(
@@ -27,38 +31,54 @@ fun PlaylistsScreen(
     viewModel: PlaylistsViewModel = hiltViewModel()
 ) {
     val customPlaylists by viewModel.customPlaylists.collectAsStateWithLifecycle()
+    val palette = LocalTerminalPalette.current
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "> PLAYLISTS_",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
+        TerminalTypewriterHeader(
+            text = "> PLAYLISTS",
+            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        PlaylistKind.entries.forEach { kind ->
+        PlaylistKind.entries.forEachIndexed { index, kind ->
+            val kindColor = when (index % 4) {
+                0 -> palette.primaryAccent
+                1 -> palette.secondaryAccent
+                2 -> palette.tertiaryAccent
+                else -> palette.highlightAccent
+            }
+
             TerminalBorder(
                 modifier = Modifier.fillMaxWidth().clickable { onPlaylistClick(kind) }
             ) {
                 Text(
                     text = "[ ${kind.title} ]",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = kindColor,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = TerminalFontFamily
                 )
             }
         }
 
         if (customPlaylists.isNotEmpty()) {
             Text(
-                text = "IMPORTED",
+                text = "IMPORTED PLAYLISTS",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = palette.tertiaryAccent,
+                fontWeight = FontWeight.Bold,
+                fontFamily = TerminalFontFamily,
                 modifier = Modifier.padding(top = 8.dp)
             )
-            customPlaylists.forEach { playlist ->
+            customPlaylists.forEachIndexed { idx, playlist ->
+                val customColor = when (idx % 3) {
+                    0 -> palette.secondaryAccent
+                    1 -> palette.tertiaryAccent
+                    else -> palette.highlightAccent
+                }
                 TerminalBorder(
                     modifier = Modifier.fillMaxWidth().clickable { onCustomPlaylistClick(playlist.id) }
                 ) {
@@ -70,12 +90,15 @@ fun PlaylistsScreen(
                         Text(
                             text = "[ ${playlist.name} ]",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = customColor,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = TerminalFontFamily
                         )
                         Text(
                             text = "${playlist.songCount} tracks",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontFamily = TerminalFontFamily
                         )
                     }
                 }
@@ -84,7 +107,8 @@ fun PlaylistsScreen(
             Text(
                 text = "[ import an m3u playlist from Settings > Library to see it here ]",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = palette.tertiaryAccent.copy(alpha = 0.8f),
+                fontFamily = TerminalFontFamily,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }

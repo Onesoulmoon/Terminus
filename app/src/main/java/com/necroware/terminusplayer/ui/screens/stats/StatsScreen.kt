@@ -24,6 +24,7 @@ import com.necroware.terminusplayer.data.repository.TopCategoryItem
 import com.necroware.terminusplayer.ui.components.BarDatum
 import com.necroware.terminusplayer.ui.components.BlockyBarChart
 import com.necroware.terminusplayer.ui.components.TerminalBorder
+import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,10 +39,9 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         item {
-            Text(
-                text = "> STATS_",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+            TerminalTypewriterHeader(
+                text = "> STATS",
+                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                 modifier = Modifier.padding(top = 20.dp)
             )
         }
@@ -60,15 +60,19 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatsRange.entries.forEach { range ->
+                val palette = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current
+                StatsRange.entries.forEachIndexed { idx, range ->
+                    val rangeColor = when (idx % 4) {
+                        0 -> palette.primaryAccent
+                        1 -> palette.secondaryAccent
+                        2 -> palette.tertiaryAccent
+                        else -> palette.highlightAccent
+                    }
                     Text(
                         text = "[${range.label}]",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (range == state.range) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                        fontWeight = if (range == state.range) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal,
+                        color = if (range == state.range) rangeColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.clickable { viewModel.selectRange(range) }
                     )
                 }

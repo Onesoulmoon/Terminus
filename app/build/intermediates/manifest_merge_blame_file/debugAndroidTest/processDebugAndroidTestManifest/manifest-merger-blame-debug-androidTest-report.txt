@@ -3,32 +3,32 @@
 3    package="com.necroware.terminusplayer.test" >
 4
 5    <uses-sdk
-5-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:5:5-74
+5-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:5:5-74
 6        android:minSdkVersion="29"
-6-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:5:15-41
+6-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:5:15-41
 7        android:targetSdkVersion="34" />
-7-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:5:42-71
+7-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:5:42-71
 8
 9    <instrumentation
-9-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:11:5-15:78
+9-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:11:5-15:78
 10        android:name="android.test.InstrumentationTestRunner"
-10-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:11:22-75
+10-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:11:22-75
 11        android:functionalTest="false"
-11-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:14:22-52
+11-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:14:22-52
 12        android:handleProfiling="false"
-12-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:13:22-53
+12-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:13:22-53
 13        android:label="Tests for com.necroware.terminusplayer"
-13-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:15:22-76
+13-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:15:22-76
 14        android:targetPackage="com.necroware.terminusplayer" />
-14-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:12:22-74
+14-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:12:22-74
 15
 16    <application
-16-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:7:5-9:19
+16-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:7:5-9:19
 17        android:debuggable="true"
 18        android:extractNativeLibs="false" >
 19        <uses-library android:name="android.test.runner" />
-19-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:8:9-60
-19-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5577870544151129184.xml:8:23-57
+19-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:8:9-60
+19-->C:\Users\USER\Downloads\terminus-native\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest11247430930461108057.xml:8:23-57
 20    </application>
 21
 22</manifest>

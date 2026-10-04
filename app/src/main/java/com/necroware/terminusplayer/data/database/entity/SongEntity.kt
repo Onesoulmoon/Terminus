@@ -16,5 +16,6 @@ data class SongEntity(
     val trackNumber: Int = 0,
     val year: Int = 0,
     val folderPath: String = "",
-    val sizeBytes: Long = 0L
+    val sizeBytes: Long = 0L,
+    val genre: String = ""
 )

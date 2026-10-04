@@ -23,14 +23,19 @@ import com.necroware.terminusplayer.data.model.Song
 import com.necroware.terminusplayer.ui.components.SongArt
 import com.necroware.terminusplayer.util.toMinutesSeconds
 
+import androidx.compose.foundation.lazy.rememberLazyListState
+import com.necroware.terminusplayer.util.safeItemClick
+
 @Composable
 fun PlaylistDetailScreen(
     onBack: () -> Unit,
     viewModel: PlaylistDetailViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -81,17 +86,25 @@ fun PlaylistDetailScreen(
         }
 
         items(state.songs, key = { it.id }) { song ->
-            PlaylistTrackRow(song = song, onClick = { viewModel.playFrom(song) })
+            PlaylistTrackRow(
+                song = song,
+                listState = listState,
+                onClick = { viewModel.playFrom(song) }
+            )
         }
     }
 }
 
 @Composable
-private fun PlaylistTrackRow(song: Song, onClick: () -> Unit) {
+private fun PlaylistTrackRow(
+    song: Song,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .safeItemClick(listState = listState, onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

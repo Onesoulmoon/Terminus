@@ -9,18 +9,22 @@ enum class ThemePresetId {
     LUCY,
     MAINE,
     FLATLINE,
-    WIZ
+    DYNAMIC // Added for Album Art Theme
 }
 
 enum class SortField { TITLE, ARTIST, ALBUM, DATE_ADDED, DURATION }
 enum class SortDirection { ASC, DESC }
 
-enum class PlaybackArtStyle {
-    STANDARD,
-    CASSETTE,
-    REEL_TO_REEL,
-    VINYL,
-    VHS
+enum class VisualizerMode {
+    WAVE_MESH,
+    DOT_MATRIX,
+    BARS,
+    SYMMETRIC_BARS
+}
+
+enum class DynamicThemeMode {
+    DARK,
+    LIGHT
 }
 
 data class LibrarySortOrder(
@@ -33,7 +37,12 @@ data class LibrarySortOrder(
  *  android.media.audiofx.Equalizer's 5-band layout. */
 data class EqualizerSettings(
     val enabled: Boolean = false,
-    val bandGainsDb: List<Int> = List(5) { 0 }
+    val bandGainsDb: List<Int> = List(10) { 0 },
+    val preampGainDb: Float = 0f,
+    val highPassEnabled: Boolean = false,
+    val highPassFreq: Float = 40f,
+    val lowPassEnabled: Boolean = false,
+    val lowPassFreq: Float = 20000f
 )
 
 data class CrossfadeSettings(
@@ -47,7 +56,18 @@ data class UserPreferences(
     val equalizer: EqualizerSettings = EqualizerSettings(),
     val crossfade: CrossfadeSettings = CrossfadeSettings(),
     val preferHardwareDecoder: Boolean = true,
-    val playbackArtStyle: PlaybackArtStyle = PlaybackArtStyle.STANDARD,
     val lastPlayedSongId: Long? = null,
-    val lastPlayedPositionMs: Long = 0L
+    val lastPlayedPositionMs: Long = 0L,
+    val lastPlayedQueueIds: List<Long> = emptyList(),
+    val useDynamicTheme: Boolean = false,
+    val dynamicThemeMode: DynamicThemeMode = DynamicThemeMode.DARK,
+    val useCustomArtAlternatives: Boolean = false,
+    val albumArtMode: AlbumArtMode = AlbumArtMode.PIXELATED,
+    val shuffleEnabled: Boolean = false,
+    val repeatMode: Int = 0,
+    val audioMonitorEnabled: Boolean = true,
+    val visualizerMode: VisualizerMode = VisualizerMode.BARS,
+    val matrixBgEnabled: Boolean = false,
+    val usbExclusiveHqEnabled: Boolean = false,
+    val realtimeVisualizerEnabled: Boolean = false
 )

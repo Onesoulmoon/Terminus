@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.6.0 — Font & Brand Alignment
+
+- **Version bumped to 1.6.0**.
+- **JetBrains Mono applied system-wide**: audited and replaced every remaining instance of default system fonts and `FontFamily.Monospace` with the bundled `TerminalFontFamily` (JetBrains Mono).
+- **Updated Logo**: refreshed the ASCII logo in the boot screen with the requested "TERMINUS" design.
+- **Resized Transport Controls**: tuned the Now Playing layout for better ergonomics — shuffle/repeat toggles are smaller to prioritize the primary playback controls.
+
+## 1.4.1 — Final polish pass
+
+- Reorganized Settings into Appearance, Player, Library, Storage and About.
+- Added playback-art style selection to Settings.
+- Added FULL / BALANCED / MINIMAL motion modes.
+- Added an Audio Monitor toggle to reduce decorative work on weaker devices.
+- Removed the misleading unused hardware-decoder switch from Settings.
+- Reduced continuous UI animation when playback is paused or the player is not visible.
+- Removed the 60 FPS Recently Played auto-scroll loop.
+- Avoided recomputing the dynamic album palette on play/pause state changes when the artwork URI is unchanged.
+- Made the seek interpolation obey the selected motion profile.
+- Aligned EQ persistence/reset to the actual 10-band UI.
+- Properly clears persisted queue state when the playback queue is empty.
+- Version aligned to 1.4.0.
+
+
 All notable changes to TERMINUS are documented here.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
