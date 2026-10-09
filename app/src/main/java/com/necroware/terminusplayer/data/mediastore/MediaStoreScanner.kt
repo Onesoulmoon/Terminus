@@ -21,7 +21,7 @@ class MediaStoreScanner @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    suspend fun scanAudioFiles(): List<SongEntity> = withContext(Dispatchers.IO) {
+    suspend fun scanAudioFiles(excludedFolders: Set<String> = emptySet()): List<SongEntity> = withContext(Dispatchers.IO) {
         val songs = mutableListOf<SongEntity>()
 
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -72,6 +72,14 @@ class MediaStoreScanner @Inject constructor(
                 val id = cursor.getLong(idCol)
                 val path = cursor.getString(dataCol) ?: ""
                 val folderPath = File(path).parent ?: ""
+
+                if (excludedFolders.isNotEmpty()) {
+                    val isExcluded = excludedFolders.any { excluded ->
+                        excluded.isNotBlank() && (path.contains(excluded, ignoreCase = true) || folderPath.contains(excluded, ignoreCase = true))
+                    }
+                    if (isExcluded) continue
+                }
+
                 val contentUri = ContentUris.withAppendedId(collection, id)
                 val genre = if (genreCol != -1) cursor.getString(genreCol) ?: "Unknown" else "Unknown"
 

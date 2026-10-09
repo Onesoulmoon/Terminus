@@ -17,6 +17,7 @@ import com.necroware.terminusplayer.data.database.entity.PlaylistSongEntity;
 import com.necroware.terminusplayer.data.database.entity.SongEntity;
 import java.lang.Class;
 import java.lang.Exception;
+import java.lang.Integer;
 import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
@@ -40,9 +41,13 @@ public final class PlaylistDao_Impl implements PlaylistDao {
 
   private final EntityInsertionAdapter<PlaylistSongEntity> __insertionAdapterOfPlaylistSongEntity;
 
+  private final EntityInsertionAdapter<PlaylistSongEntity> __insertionAdapterOfPlaylistSongEntity_1;
+
   private final SharedSQLiteStatement __preparedStmtOfDeletePlaylist;
 
   private final SharedSQLiteStatement __preparedStmtOfDeletePlaylistSongs;
+
+  private final SharedSQLiteStatement __preparedStmtOfRemoveSongFromPlaylist;
 
   public PlaylistDao_Impl(@NonNull final RoomDatabase __db) {
     this.__db = __db;
@@ -76,6 +81,21 @@ public final class PlaylistDao_Impl implements PlaylistDao {
         statement.bindLong(3, entity.getPosition());
       }
     };
+    this.__insertionAdapterOfPlaylistSongEntity_1 = new EntityInsertionAdapter<PlaylistSongEntity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `playlist_songs` (`playlistId`,`songId`,`position`) VALUES (?,?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final PlaylistSongEntity entity) {
+        statement.bindLong(1, entity.getPlaylistId());
+        statement.bindLong(2, entity.getSongId());
+        statement.bindLong(3, entity.getPosition());
+      }
+    };
     this.__preparedStmtOfDeletePlaylist = new SharedSQLiteStatement(__db) {
       @Override
       @NonNull
@@ -89,6 +109,14 @@ public final class PlaylistDao_Impl implements PlaylistDao {
       @NonNull
       public String createQuery() {
         final String _query = "DELETE FROM playlist_songs WHERE playlistId = ?";
+        return _query;
+      }
+    };
+    this.__preparedStmtOfRemoveSongFromPlaylist = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM playlist_songs WHERE playlistId = ? AND songId = ?";
         return _query;
       }
     };
@@ -123,6 +151,25 @@ public final class PlaylistDao_Impl implements PlaylistDao {
         __db.beginTransaction();
         try {
           __insertionAdapterOfPlaylistSongEntity.insert(songs);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertPlaylistSong(final PlaylistSongEntity playlistSong,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfPlaylistSongEntity_1.insert(playlistSong);
           __db.setTransactionSuccessful();
           return Unit.INSTANCE;
         } finally {
@@ -179,6 +226,34 @@ public final class PlaylistDao_Impl implements PlaylistDao {
           }
         } finally {
           __preparedStmtOfDeletePlaylistSongs.release(_stmt);
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object removeSongFromPlaylist(final long playlistId, final long songId,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfRemoveSongFromPlaylist.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, playlistId);
+        _argIndex = 2;
+        _stmt.bindLong(_argIndex, songId);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfRemoveSongFromPlaylist.release(_stmt);
         }
       }
     }, $completion);
@@ -327,6 +402,41 @@ public final class PlaylistDao_Impl implements PlaylistDao {
             } else {
               _result = _cursor.getString(0);
             }
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object getMaxPosition(final long playlistId,
+      final Continuation<? super Integer> $completion) {
+    final String _sql = "SELECT MAX(position) FROM playlist_songs WHERE playlistId = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, playlistId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Integer>() {
+      @Override
+      @Nullable
+      public Integer call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final Integer _result;
+          if (_cursor.moveToFirst()) {
+            final Integer _tmp;
+            if (_cursor.isNull(0)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getInt(0);
+            }
+            _result = _tmp;
           } else {
             _result = null;
           }

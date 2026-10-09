@@ -165,6 +165,7 @@ fun NowPlayingScreen(viewModel: PlaybackViewModel, onCollapse: () -> Unit) {
     val lyricsError by viewModel.lyricsError.collectAsStateWithLifecycle()
     val visualizerMode by viewModel.visualizerMode.collectAsStateWithLifecycle()
     val matrixBgEnabled by viewModel.matrixBgEnabled.collectAsStateWithLifecycle()
+    val timelineStyle by viewModel.timelineStyle.collectAsStateWithLifecycle()
     val currentTrackBitmap by viewModel.currentTrackBitmap.collectAsStateWithLifecycle()
 
     val durationMs by viewModel.durationMs.collectAsStateWithLifecycle()
@@ -342,6 +343,8 @@ fun NowPlayingScreen(viewModel: PlaybackViewModel, onCollapse: () -> Unit) {
                     smoothPositionState.value = newPositionMs
                     viewModel.seekTo(newPositionMs)
                 },
+                style = timelineStyle,
+                tipColor = activeThemePalette.highlightAccent,
                 modifier = Modifier.fillMaxWidth()
             )
 

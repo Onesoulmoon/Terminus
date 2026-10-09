@@ -70,6 +70,22 @@ class LibraryViewModel @Inject constructor(
     val folders: StateFlow<List<String>> = repository.observeAllFolders()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val customPlaylists = repository.observeCustomPlaylists()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun addSongToPlaylist(playlistId: Long, songId: Long) {
+        viewModelScope.launch {
+            repository.addSongToPlaylist(playlistId, songId)
+        }
+    }
+
+    fun createPlaylistAndAddSong(name: String, songId: Long) {
+        viewModelScope.launch {
+            val playlistId = repository.createCustomPlaylist(name)
+            repository.addSongToPlaylist(playlistId, songId)
+        }
+    }
+
     val folderNodes: StateFlow<List<FolderNode>> = combine(repository.observeAllSongs(), _currentFolderPath) { allSongs, currentPath ->
         if (currentPath == null) {
             val parentMap = allSongs.groupBy { song ->

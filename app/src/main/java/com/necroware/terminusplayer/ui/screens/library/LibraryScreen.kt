@@ -49,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.necroware.terminusplayer.ui.theme.TerminalFontFamily
 import com.necroware.terminusplayer.data.model.Album
+import com.necroware.terminusplayer.ui.components.AddToPlaylistDialog
+import com.necroware.terminusplayer.ui.components.CreatePlaylistDialog
 import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -65,9 +67,13 @@ fun LibraryScreen(
     val albums by viewModel.albums.collectAsStateWithLifecycle()
     val artists by viewModel.artists.collectAsStateWithLifecycle()
     val folders by viewModel.folders.collectAsStateWithLifecycle()
+    val customPlaylists by viewModel.customPlaylists.collectAsStateWithLifecycle()
 
     var songToOption by remember { mutableStateOf<Song?>(null) }
     var pendingDeleteSong by remember { mutableStateOf<Song?>(null) }
+    var songForPlaylist by remember { mutableStateOf<Song?>(null) }
+    var showAddToPlaylistDialog by remember { mutableStateOf(false) }
+    var showCreatePlaylistDialog by remember { mutableStateOf(false) }
     
     val songsListState = rememberLazyListState()
     val albumsGridState = rememberLazyGridState()
@@ -328,7 +334,11 @@ fun LibraryScreen(
                 onDismiss = { songToOption = null },
                 onPlayNext = { viewModel.playNext(song) },
                 onAddToQueue = { viewModel.addToQueue(song) },
-                onAddToPlaylist = { /* TODO */ },
+                onAddToPlaylist = {
+                    songForPlaylist = song
+                    songToOption = null
+                    showAddToPlaylistDialog = true
+                },
                 onDelete = {
                     songToOption = null
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -342,6 +352,44 @@ fun LibraryScreen(
                     } else {
                         viewModel.deleteSongDirect(song)
                     }
+                }
+            )
+        }
+
+        if (showAddToPlaylistDialog && songForPlaylist != null) {
+            AddToPlaylistDialog(
+                playlists = customPlaylists,
+                onDismiss = {
+                    showAddToPlaylistDialog = false
+                },
+                onSelectPlaylist = { playlistId ->
+                    val targetSong = songForPlaylist
+                    if (targetSong != null) {
+                        viewModel.addSongToPlaylist(playlistId, targetSong.id)
+                    }
+                    showAddToPlaylistDialog = false
+                    songForPlaylist = null
+                },
+                onCreateNewPlaylist = {
+                    showAddToPlaylistDialog = false
+                    showCreatePlaylistDialog = true
+                }
+            )
+        }
+
+        if (showCreatePlaylistDialog && songForPlaylist != null) {
+            CreatePlaylistDialog(
+                onDismiss = {
+                    showCreatePlaylistDialog = false
+                    songForPlaylist = null
+                },
+                onCreate = { name ->
+                    val targetSong = songForPlaylist
+                    if (targetSong != null) {
+                        viewModel.createPlaylistAndAddSong(name, targetSong.id)
+                    }
+                    showCreatePlaylistDialog = false
+                    songForPlaylist = null
                 }
             )
         }

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -40,6 +41,8 @@ private object Keys {
     val EQ_HP_FREQ = androidx.datastore.preferences.core.floatPreferencesKey("eq_hp_freq")
     val EQ_LP_ENABLED = booleanPreferencesKey("eq_lp_enabled")
     val EQ_LP_FREQ = androidx.datastore.preferences.core.floatPreferencesKey("eq_lp_freq")
+    val TIMELINE_STYLE = stringPreferencesKey("timeline_style")
+    val EXCLUDED_FOLDERS = stringSetPreferencesKey("excluded_folders")
 }
 
 private fun eqBandKey(index: Int) = intPreferencesKey("${Keys.EQ_BAND_PREFIX}$index")
@@ -165,6 +168,28 @@ class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.EQ_LP_FREQ] = freq }
     }
 
+    suspend fun setTimelineStyle(style: TimelineStyle) {
+        dataStore.edit { it[Keys.TIMELINE_STYLE] = style.name }
+    }
+
+    suspend fun setExcludedFolders(folders: Set<String>) {
+        dataStore.edit { it[Keys.EXCLUDED_FOLDERS] = folders }
+    }
+
+    suspend fun addExcludedFolder(folder: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[Keys.EXCLUDED_FOLDERS] ?: setOf("WhatsApp", "WhatsApp Audio", "WhatsApp Voice Notes", "Recordings", "CallRecord")
+            prefs[Keys.EXCLUDED_FOLDERS] = current + folder
+        }
+    }
+
+    suspend fun removeExcludedFolder(folder: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[Keys.EXCLUDED_FOLDERS] ?: setOf("WhatsApp", "WhatsApp Audio", "WhatsApp Voice Notes", "Recordings", "CallRecord")
+            prefs[Keys.EXCLUDED_FOLDERS] = current - folder
+        }
+    }
+
     private fun Preferences.toUserPreferences(): UserPreferences {
         val defaults = UserPreferences()
         val themeId = this[Keys.THEME_ID]?.let { runCatching { ThemePresetId.valueOf(it) }.getOrNull() }
@@ -183,6 +208,10 @@ class UserPreferencesRepository @Inject constructor(
         val eqBands = List(10) { index -> this[eqBandKey(index)] ?: 0 } // Expanded to 10 for better EQ
 
         val queueIds = this[Keys.LAST_PLAYED_QUEUE_IDS]?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
+
+        val timelineStyle = this[Keys.TIMELINE_STYLE]?.let { runCatching { TimelineStyle.valueOf(it) }.getOrNull() }
+            ?: defaults.timelineStyle
+        val excludedFolders = this[Keys.EXCLUDED_FOLDERS] ?: defaults.excludedFolders
 
         return UserPreferences(
             themeId = themeId,
@@ -214,7 +243,9 @@ class UserPreferencesRepository @Inject constructor(
             visualizerMode = visualizerMode,
             matrixBgEnabled = matrixBgEnabled,
             usbExclusiveHqEnabled = this[Keys.USB_EXCLUSIVE_HQ_ENABLED] ?: defaults.usbExclusiveHqEnabled,
-            realtimeVisualizerEnabled = this[Keys.REALTIME_VISUALIZER_ENABLED] ?: defaults.realtimeVisualizerEnabled
+            realtimeVisualizerEnabled = this[Keys.REALTIME_VISUALIZER_ENABLED] ?: defaults.realtimeVisualizerEnabled,
+            timelineStyle = timelineStyle,
+            excludedFolders = excludedFolders
         )
     }
 }

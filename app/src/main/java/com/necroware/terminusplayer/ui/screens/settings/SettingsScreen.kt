@@ -2,33 +2,35 @@ package com.necroware.terminusplayer.ui.screens.settings
 
 import android.app.role.RoleManager
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.border
 import androidx.compose.foundation.Canvas
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.ui.graphics.Path
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -36,39 +38,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.necroware.terminusplayer.BuildConfig
 import com.necroware.terminusplayer.data.prefs.AlbumArtMode
+import com.necroware.terminusplayer.data.prefs.DynamicThemeMode
 import com.necroware.terminusplayer.data.prefs.SortDirection
 import com.necroware.terminusplayer.data.prefs.SortField
-import com.necroware.terminusplayer.BuildConfig
-import com.necroware.terminusplayer.data.prefs.DynamicThemeMode
 import com.necroware.terminusplayer.data.prefs.ThemePresetId
+import com.necroware.terminusplayer.data.prefs.TimelineStyle
+import com.necroware.terminusplayer.data.prefs.UserPreferences
+import com.necroware.terminusplayer.data.prefs.VisualizerMode
+import com.necroware.terminusplayer.ui.components.BlockSeekBar
 import com.necroware.terminusplayer.ui.components.TerminalBorder
 import com.necroware.terminusplayer.ui.components.TerminalSlider
 import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
+import com.necroware.terminusplayer.ui.theme.LocalTerminalPalette
 import com.necroware.terminusplayer.ui.theme.ThemePresets
 import kotlinx.coroutines.delay
 
 
 @Composable
 private fun DefaultMusicPlayerRow() {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
-    androidx.compose.foundation.layout.Column(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 10.dp)
-            .clip(androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+            .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable {
                 val roleManager = context.getSystemService(RoleManager::class.java)
@@ -101,8 +115,9 @@ private fun DefaultMusicPlayerRow() {
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
+    val allFolders by viewModel.allFolders.collectAsStateWithLifecycle()
     val importStatus by viewModel.importStatus.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("APPEARANCE", "PLAYER", "LIBRARY", "STORAGE", "ABOUT")
@@ -192,6 +207,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                     }
                 }
                 1 -> {
+                    item { SectionLabel("TIMELINE PROGRESS INDICATOR") }
+                    item {
+                        TimelineStyleSection(
+                            selectedStyle = prefs.timelineStyle,
+                            onStyleChange = viewModel::setTimelineStyle
+                        )
+                    }
                     item { SectionLabel("EQUALIZER APO CONFIGURATION EDITOR") }
                     item {
                         EqualizerApoConfigurationEditor(
@@ -250,6 +272,16 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                     }
                 }
                 2 -> {
+                    item { SectionLabel("FOLDER EXCLUSIONS") }
+                    item {
+                        FolderExclusionSection(
+                            excludedFolders = prefs.excludedFolders,
+                            allFolders = allFolders,
+                            onAddExclusion = viewModel::addExcludedFolder,
+                            onRemoveExclusion = viewModel::removeExcludedFolder,
+                            onToggleFolder = viewModel::toggleFolderExclusion
+                        )
+                    }
                     item { SectionLabel("SORT ORDER") }
                     item {
                         SortSection(
@@ -292,13 +324,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                     item { SectionLabel("DEVELOPER") }
                     item {
                         ActionRow("[ GITHUB REPOSITORY ]", "https://github.com/Onesoulmoon/Terminus") {
-                            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/Onesoulmoon/Terminus"))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Onesoulmoon/Terminus"))
                             context.startActivity(intent)
                         }
                     }
                     item {
                         ActionRow("[ CONTACT EMAIL ]", "onesoulmoon@gmail.com") {
-                            val intent = Intent(Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:onesoulmoon@gmail.com"))
+                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:onesoulmoon@gmail.com"))
                             context.startActivity(intent)
                         }
                     }
@@ -350,7 +382,202 @@ private fun Swatch(background: Color, accent: Color) {
     }
 }
 
+@Composable
+private fun TimelineStyleSection(
+    selectedStyle: TimelineStyle,
+    onStyleChange: (TimelineStyle) -> Unit
+) {
+    val palette = LocalTerminalPalette.current
+    TerminalBorder(modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                text = "TIMELINE INDICATOR STYLE",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
+            TimelineStyle.entries.forEach { style ->
+                val isSelected = style == selectedStyle
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onStyleChange(style) }
+                        .padding(vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = (if (isSelected) "> " else "  ") + when (style) {
+                                TimelineStyle.HIGHLIGHTED_BLOCKS -> "BLOCKS (HIGHLIGHTED TIP)"
+                                TimelineStyle.ARROW_RAIL -> "ARROW RAIL [=======>........]"
+                                TimelineStyle.STAR_RAIL -> "STAR RAIL [oooooooo*---------]"
+                            },
+                            style = MaterialTheme.typography.labelMedium,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                        if (isSelected) {
+                            Text(
+                                text = "[ACTIVE]",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    BlockSeekBar(
+                        positionProvider = { 150000L },
+                        durationMs = 300000L,
+                        onSeek = {},
+                        style = style,
+                        tipColor = palette.highlightAccent,
+                        modifier = Modifier.padding(top = 4.dp).fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FolderExclusionSection(
+    excludedFolders: Set<String>,
+    allFolders: List<String>,
+    onAddExclusion: (String) -> Unit,
+    onRemoveExclusion: (String) -> Unit,
+    onToggleFolder: (String) -> Unit
+) {
+    var newFolderText by remember { mutableStateOf("") }
+    val palette = LocalTerminalPalette.current
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        TerminalBorder(modifier = Modifier.fillMaxWidth()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "EXCLUDED PATH PATTERNS",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Files matching these sub-paths or folder names (e.g. WhatsApp, Recordings) will be excluded from library scans.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                excludedFolders.forEach { excluded ->
+                    if (excluded.isNotBlank()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "[ $excluded ]",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = palette.secondaryAccent
+                            )
+                            Text(
+                                text = "[ REMOVE ]",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.clickable { onRemoveExclusion(excluded) }
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = newFolderText,
+                        onValueChange = { newFolderText = it },
+                        placeholder = { Text("folder name or subpath", fontSize = 12.sp) },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = Color.DarkGray
+                        )
+                    )
+                    Text(
+                        text = "[ ADD ]",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (newFolderText.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable(enabled = newFolderText.isNotBlank()) {
+                                onAddExclusion(newFolderText)
+                                newFolderText = ""
+                            }
+                            .padding(8.dp)
+                    )
+                }
+            }
+        }
+
+        if (allFolders.isNotEmpty()) {
+            TerminalBorder(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "DETECTED LIBRARY FOLDERS",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Toggle individual folders to exclude or include them in your library:",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    allFolders.forEach { folderPath ->
+                        val folderName = folderPath.substringAfterLast("/").ifBlank { folderPath }
+                        val isExcluded = excludedFolders.any { 
+                            it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                Text(
+                                    text = folderName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (isExcluded) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = folderPath,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            Text(
+                                text = if (isExcluded) "[ EXCLUDED ]" else "[ INCLUDED ]",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isExcluded) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.clickable { onToggleFolder(folderPath) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 private fun DynamicThemeModeSection(
@@ -416,12 +643,12 @@ private val EQ_BAND_LABELS = listOf("31", "62", "125", "250", "500", "1k", "2k",
 
 @Composable
 private fun VisualizerModeSection(
-    mode: com.necroware.terminusplayer.data.prefs.VisualizerMode,
-    onModeChange: (com.necroware.terminusplayer.data.prefs.VisualizerMode) -> Unit
+    mode: VisualizerMode,
+    onModeChange: (VisualizerMode) -> Unit
 ) {
     TerminalBorder(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            com.necroware.terminusplayer.data.prefs.VisualizerMode.entries.forEach { candidate ->
+            VisualizerMode.entries.forEach { candidate ->
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable { onModeChange(candidate) },
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -443,7 +670,7 @@ private fun VisualizerModeSection(
 
 @Composable
 private fun EqualizerApoConfigurationEditor(
-    prefs: com.necroware.terminusplayer.data.prefs.UserPreferences,
+    prefs: UserPreferences,
     viewModel: SettingsViewModel
 ) {
     val eq = prefs.equalizer
@@ -579,7 +806,7 @@ private fun EqualizerApoConfigurationEditor(
                             originFraction = 0.5f,
                             modifier = Modifier.weight(1f)
                         )
-                        Text("${if (gainDb > 0) "+" else ""}${gainDb}dB", style = MaterialTheme.typography.bodySmall, color = if (eq.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.width(50.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End)
+                        Text("${if (gainDb > 0) "+" else ""}${gainDb}dB", style = MaterialTheme.typography.bodySmall, color = if (eq.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.width(50.dp), textAlign = TextAlign.End)
                     }
                 }
             }

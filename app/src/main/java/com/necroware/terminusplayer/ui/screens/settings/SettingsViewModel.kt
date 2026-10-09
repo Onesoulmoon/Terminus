@@ -11,6 +11,7 @@ import com.necroware.terminusplayer.data.prefs.LibrarySortOrder
 import com.necroware.terminusplayer.data.prefs.SortDirection
 import com.necroware.terminusplayer.data.prefs.SortField
 import com.necroware.terminusplayer.data.prefs.ThemePresetId
+import com.necroware.terminusplayer.data.prefs.TimelineStyle
 import com.necroware.terminusplayer.data.prefs.UserPreferences
 import com.necroware.terminusplayer.data.prefs.UserPreferencesRepository
 import com.necroware.terminusplayer.data.repository.MusicRepository
@@ -42,8 +43,41 @@ class SettingsViewModel @Inject constructor(
     val preferences: StateFlow<UserPreferences> = preferencesRepository.preferences
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferences())
 
+    val allFolders: StateFlow<List<String>> = repository.observeAllFolders()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _importStatus = MutableStateFlow<ImportStatus>(ImportStatus.Idle)
     val importStatus: StateFlow<ImportStatus> = _importStatus.asStateFlow()
+
+    fun setTimelineStyle(style: TimelineStyle) = viewModelScope.launch {
+        preferencesRepository.setTimelineStyle(style)
+    }
+
+    fun addExcludedFolder(folder: String) = viewModelScope.launch {
+        if (folder.isNotBlank()) {
+            repository.addExcludedFolder(folder.trim())
+        }
+    }
+
+    fun removeExcludedFolder(folder: String) = viewModelScope.launch {
+        repository.removeExcludedFolder(folder)
+    }
+
+    fun toggleFolderExclusion(folderPath: String) = viewModelScope.launch {
+        val currentExclusions = preferences.value.excludedFolders
+        val folderName = folderPath.substringAfterLast("/").ifBlank { folderPath }
+        val isExcluded = currentExclusions.any { 
+            it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
+        }
+        if (isExcluded) {
+            val matchedRule = currentExclusions.firstOrNull { 
+                it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
+            } ?: folderName
+            repository.removeExcludedFolder(matchedRule)
+        } else {
+            repository.addExcludedFolder(folderName)
+        }
+    }
 
     fun setTheme(id: ThemePresetId) = viewModelScope.launch { preferencesRepository.setTheme(id) }
 

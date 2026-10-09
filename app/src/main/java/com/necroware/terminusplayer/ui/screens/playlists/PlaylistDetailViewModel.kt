@@ -77,6 +77,25 @@ class PlaylistDetailViewModel @Inject constructor(
         }
     }
 
+    val isCustomPlaylist: Boolean = customPlaylistId != null
+
+    fun deletePlaylist(onDeleted: () -> Unit) {
+        val id = customPlaylistId ?: return
+        viewModelScope.launch {
+            repository.deletePlaylist(id)
+            onDeleted()
+        }
+    }
+
+    fun removeSong(song: Song) {
+        val id = customPlaylistId ?: return
+        viewModelScope.launch {
+            repository.removeSongFromPlaylist(id, song.id)
+            val updatedSongs = repository.getSongsForPlaylist(id)
+            _uiState.value = _uiState.value.copy(songs = updatedSongs)
+        }
+    }
+
     fun playAll() {
         val songs = _uiState.value.songs
         if (songs.isNotEmpty()) playbackController.playSongs(songs.toMediaItems(), 0)

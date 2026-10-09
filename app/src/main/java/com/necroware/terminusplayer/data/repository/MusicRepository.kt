@@ -23,6 +23,7 @@ import com.necroware.terminusplayer.data.model.Song
 import com.necroware.terminusplayer.util.matchM3uEntryToSong
 import com.necroware.terminusplayer.util.normalizeForMatch
 import com.necroware.terminusplayer.util.parseM3u
+import com.necroware.terminusplayer.data.prefs.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,12 +41,14 @@ class MusicRepository @Inject constructor(
     private val likedSongDao: LikedSongDao,
     private val playEventDao: PlayEventDao,
     private val playlistDao: PlaylistDao,
+    private val preferencesRepository: UserPreferencesRepository,
     private val scanner: MediaStoreScanner
 ) {
 
     /** Re-scans MediaStore and syncs the Room cache. Call on app start and pull-to-refresh. */
     suspend fun syncLibrary() {
-        val scanned = scanner.scanAudioFiles()
+        val excludedFolders = preferencesRepository.preferences.first().excludedFolders
+        val scanned = scanner.scanAudioFiles(excludedFolders)
         songDao.upsertAll(scanned)
         songDao.pruneDeleted(scanned.map { it.mediaStoreId })
     }
@@ -245,9 +248,41 @@ class MusicRepository @Inject constructor(
 
     suspend fun getPlaylistName(playlistId: Long): String = playlistDao.getPlaylistName(playlistId) ?: "PLAYLIST"
 
+    suspend fun createCustomPlaylist(name: String): Long {
+        val entity = PlaylistEntity(name = name, createdAt = System.currentTimeMillis())
+        return playlistDao.insertPlaylist(entity)
+    }
+
+    suspend fun addSongToPlaylist(playlistId: Long, songId: Long) {
+        val currentMaxPos = playlistDao.getMaxPosition(playlistId) ?: -1
+        val newPos = currentMaxPos + 1
+        playlistDao.insertPlaylistSong(PlaylistSongEntity(playlistId = playlistId, songId = songId, position = newPos))
+    }
+
+    suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long) {
+        playlistDao.removeSongFromPlaylist(playlistId, songId)
+    }
+
     suspend fun deletePlaylist(playlistId: Long) {
         playlistDao.deletePlaylistSongs(playlistId)
         playlistDao.deletePlaylist(playlistId)
+    }
+
+    // ---- Folder Exclusions -----------------------------------------------
+
+    suspend fun updateExcludedFolders(folders: Set<String>) {
+        preferencesRepository.setExcludedFolders(folders)
+        syncLibrary()
+    }
+
+    suspend fun addExcludedFolder(folder: String) {
+        preferencesRepository.addExcludedFolder(folder)
+        syncLibrary()
+    }
+
+    suspend fun removeExcludedFolder(folder: String) {
+        preferencesRepository.removeExcludedFolder(folder)
+        syncLibrary()
     }
 
     /**

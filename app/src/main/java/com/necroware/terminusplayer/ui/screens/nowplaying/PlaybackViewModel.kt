@@ -3,6 +3,7 @@ package com.necroware.terminusplayer.ui.screens.nowplaying
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.necroware.terminusplayer.data.prefs.TimelineStyle
 import com.necroware.terminusplayer.data.prefs.UserPreferencesRepository
 import com.necroware.terminusplayer.data.repository.MusicRepository
 import com.necroware.terminusplayer.data.repository.TrackMetadataRepository
@@ -96,6 +97,10 @@ class PlaybackViewModel @Inject constructor(
     val matrixBgEnabled: StateFlow<Boolean> = preferencesRepository.preferences
         .map { it.matrixBgEnabled }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val timelineStyle: StateFlow<TimelineStyle> = preferencesRepository.preferences
+        .map { it.timelineStyle }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TimelineStyle.HIGHLIGHTED_BLOCKS)
 
     private val _showLyrics = MutableStateFlow(false)
     val showLyrics: StateFlow<Boolean> = _showLyrics
