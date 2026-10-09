@@ -142,6 +142,7 @@ class MusicService : MediaSessionService() {
 
     private var isRealtimeVisualizerEnabled = false
 
+    @OptIn(UnstableApi::class)
     private val playerListener = object : Player.Listener {
         override fun onAudioSessionIdChanged(audioSessionId: Int) {
             if (audioSessionId != C.AUDIO_SESSION_ID_UNSET) {

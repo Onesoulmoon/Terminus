@@ -437,46 +437,37 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
-
       static String com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel = "com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
+      static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
 
       static String com_necroware_terminusplayer_util_UiFeedbackViewModel = "com.necroware.terminusplayer.util.UiFeedbackViewModel";
 
-      static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
-
-      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
-
       static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel = "com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel";
 
+      static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
+
+      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
+
       static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
 
-      @KeepFieldType
-      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
 
-      @KeepFieldType
-      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
+      static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
 
       @KeepFieldType
       SettingsViewModel com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel2;
 
       @KeepFieldType
-      PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
-
-      @KeepFieldType
-      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
+      AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
 
       @KeepFieldType
       LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
@@ -485,22 +476,31 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       UiFeedbackViewModel com_necroware_terminusplayer_util_UiFeedbackViewModel2;
 
       @KeepFieldType
-      AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
-
-      @KeepFieldType
-      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
-
-      @KeepFieldType
-      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
-
-      @KeepFieldType
       PlaylistDetailViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel2;
 
       @KeepFieldType
       YouTubeDownloadViewModel com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel2;
 
       @KeepFieldType
+      ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
+
+      @KeepFieldType
+      SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
+
+      @KeepFieldType
+      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
+
+      @KeepFieldType
+      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
+
+      @KeepFieldType
       HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
+
+      @KeepFieldType
+      PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
+
+      @KeepFieldType
+      PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
     }
   }
 
@@ -581,27 +581,27 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
     private static final class LazyClassKeyProvider {
       static String com_necroware_terminusplayer_util_UiFeedbackViewModel = "com.necroware.terminusplayer.util.UiFeedbackViewModel";
 
-      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
-
       static String com_necroware_terminusplayer_ui_screens_search_SearchViewModel = "com.necroware.terminusplayer.ui.screens.search.SearchViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
-
-      static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel = "com.necroware.terminusplayer.ui.screens.artistdetail.ArtistDetailViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistsViewModel";
 
+      static String com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel = "com.necroware.terminusplayer.ui.screens.playlists.PlaylistDetailViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_library_LibraryViewModel = "com.necroware.terminusplayer.ui.screens.library.LibraryViewModel";
+
       static String com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel = "com.necroware.terminusplayer.ui.screens.albumdetail.AlbumDetailViewModel";
 
+      static String com_necroware_terminusplayer_ui_screens_home_HomeViewModel = "com.necroware.terminusplayer.ui.screens.home.HomeViewModel";
+
+      static String com_necroware_terminusplayer_MainActivityViewModel = "com.necroware.terminusplayer.MainActivityViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel = "com.necroware.terminusplayer.ui.screens.nowplaying.PlaybackViewModel";
+
       static String com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel = "com.necroware.terminusplayer.ui.screens.settings.SettingsViewModel";
+
+      static String com_necroware_terminusplayer_ui_screens_stats_StatsViewModel = "com.necroware.terminusplayer.ui.screens.stats.StatsViewModel";
 
       static String com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel = "com.necroware.terminusplayer.ui.screens.download.YouTubeDownloadViewModel";
 
@@ -609,25 +609,7 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       UiFeedbackViewModel com_necroware_terminusplayer_util_UiFeedbackViewModel2;
 
       @KeepFieldType
-      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
-
-      @KeepFieldType
-      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
-
-      @KeepFieldType
-      PlaylistDetailViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel2;
-
-      @KeepFieldType
-      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
-
-      @KeepFieldType
       SearchViewModel com_necroware_terminusplayer_ui_screens_search_SearchViewModel2;
-
-      @KeepFieldType
-      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
-
-      @KeepFieldType
-      PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
 
       @KeepFieldType
       ArtistDetailViewModel com_necroware_terminusplayer_ui_screens_artistdetail_ArtistDetailViewModel2;
@@ -636,10 +618,28 @@ public final class DaggerTerminusApplication_HiltComponents_SingletonC {
       PlaylistsViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistsViewModel2;
 
       @KeepFieldType
+      PlaylistDetailViewModel com_necroware_terminusplayer_ui_screens_playlists_PlaylistDetailViewModel2;
+
+      @KeepFieldType
+      LibraryViewModel com_necroware_terminusplayer_ui_screens_library_LibraryViewModel2;
+
+      @KeepFieldType
       AlbumDetailViewModel com_necroware_terminusplayer_ui_screens_albumdetail_AlbumDetailViewModel2;
 
       @KeepFieldType
+      HomeViewModel com_necroware_terminusplayer_ui_screens_home_HomeViewModel2;
+
+      @KeepFieldType
+      MainActivityViewModel com_necroware_terminusplayer_MainActivityViewModel2;
+
+      @KeepFieldType
+      PlaybackViewModel com_necroware_terminusplayer_ui_screens_nowplaying_PlaybackViewModel2;
+
+      @KeepFieldType
       SettingsViewModel com_necroware_terminusplayer_ui_screens_settings_SettingsViewModel2;
+
+      @KeepFieldType
+      StatsViewModel com_necroware_terminusplayer_ui_screens_stats_StatsViewModel2;
 
       @KeepFieldType
       YouTubeDownloadViewModel com_necroware_terminusplayer_ui_screens_download_YouTubeDownloadViewModel2;

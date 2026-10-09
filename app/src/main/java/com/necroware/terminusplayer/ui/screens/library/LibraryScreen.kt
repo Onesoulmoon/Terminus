@@ -116,12 +116,20 @@ fun LibraryScreen(
                     text = "> LIBRARY",
                     fontSize = MaterialTheme.typography.headlineMedium.fontSize
                 )
-                Text(
-                    text = "[SEARCH]",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { onSearchClick() }
-                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        text = "[RESCAN]",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { viewModel.rescanLibrary() }
+                    )
+                    Text(
+                        text = "[SEARCH]",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { onSearchClick() }
+                    )
+                }
             }
 
             Row(

@@ -185,8 +185,14 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun removeExcludedFolder(folder: String) {
         dataStore.edit { prefs ->
-            val current = prefs[Keys.EXCLUDED_FOLDERS] ?: setOf("WhatsApp", "WhatsApp Audio", "WhatsApp Voice Notes", "Recordings", "CallRecord")
+            val current = prefs[Keys.EXCLUDED_FOLDERS] ?: emptySet()
             prefs[Keys.EXCLUDED_FOLDERS] = current - folder
+        }
+    }
+
+    suspend fun clearExcludedFolders() {
+        dataStore.edit { prefs ->
+            prefs[Keys.EXCLUDED_FOLDERS] = emptySet()
         }
     }
 

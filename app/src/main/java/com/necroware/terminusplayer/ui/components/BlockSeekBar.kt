@@ -27,8 +27,8 @@ import com.necroware.terminusplayer.ui.theme.LocalTerminalPalette
  * Customizable ASCII timeline seekbar with 3 selectable styles:
  * - HIGHLIGHTED_BLOCKS: [█████░░░░] with highlighted active playhead tip
  * - ARROW_RAIL: [=======>........]
- * - STAR_RAIL: [oooooooo*---------]
- * Tap or drag anywhere on the bar to seek.
+ * - ADAPTIVE_RAIL: [ooooo*-------] progressive morphing rail (- -> * -> o)
+ * Tap or drag anywhere on the bar to seek when [interactive] is true.
  */
 @Composable
 fun BlockSeekBar(
@@ -38,7 +38,8 @@ fun BlockSeekBar(
     modifier: Modifier = Modifier,
     style: TimelineStyle = TimelineStyle.HIGHLIGHTED_BLOCKS,
     segmentCount: Int = 40,
-    tipColor: Color = LocalTerminalPalette.current.highlightAccent
+    tipColor: Color = LocalTerminalPalette.current.highlightAccent,
+    interactive: Boolean = true
 ) {
     val safeDuration = durationMs.coerceAtLeast(1L)
     var barWidthPx by remember { mutableFloatStateOf(1f) }
@@ -51,8 +52,8 @@ fun BlockSeekBar(
         onSeek((fraction * safeDuration).toLong())
     }
 
-    Canvas(
-        modifier = modifier
+    val canvasModifier = if (interactive) {
+        modifier
             .fillMaxWidth()
             .height(14.dp)
             .onSizeChanged { barWidthPx = it.width.toFloat().coerceAtLeast(1f) }
@@ -62,7 +63,14 @@ fun BlockSeekBar(
             .pointerInput(safeDuration) {
                 detectDragGestures { change, _ -> seekToOffsetX(change.position.x) }
             }
-    ) {
+    } else {
+        modifier
+            .fillMaxWidth()
+            .height(14.dp)
+            .onSizeChanged { barWidthPx = it.width.toFloat().coerceAtLeast(1f) }
+    }
+
+    Canvas(modifier = canvasModifier) {
         val position = positionProvider()
         val progressFraction = (position.toFloat() / safeDuration).coerceIn(0f, 1f)
 
@@ -94,7 +102,7 @@ fun BlockSeekBar(
                 }
             }
 
-            TimelineStyle.ARROW_RAIL, TimelineStyle.STAR_RAIL -> {
+            TimelineStyle.ARROW_RAIL, TimelineStyle.ADAPTIVE_RAIL, TimelineStyle.STAR_RAIL -> {
                 val railCount = (segmentCount - 2).coerceAtLeast(1)
                 val filledSegments = (progressFraction * railCount).toInt().coerceIn(0, railCount)
                 val segmentWidth = size.width / segmentCount
@@ -106,16 +114,17 @@ fun BlockSeekBar(
 
                 // Rail segments
                 for (i in 0 until railCount) {
-                    val isTip = (i == filledSegments - 1 && filledSegments > 0)
-                    val isFilled = (i < filledSegments)
+                    val isTip = (i == filledSegments - 1 && filledSegments > 0) || (i == 0 && filledSegments == 0 && progressFraction > 0f)
+                    val isFilled = (i < filledSegments - 1)
 
                     val char = if (style == TimelineStyle.ARROW_RAIL) {
                         when {
                             isTip -> ">"
-                            isFilled -> "="
+                            isFilled || i < filledSegments -> "="
                             else -> "."
                         }
                     } else {
+                        // ADAPTIVE_RAIL / STAR_RAIL: - -> * -> o
                         when {
                             isTip -> "*"
                             isFilled -> "o"

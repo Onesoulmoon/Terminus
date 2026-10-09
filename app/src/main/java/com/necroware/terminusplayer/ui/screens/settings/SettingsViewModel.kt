@@ -30,6 +30,7 @@ sealed interface ImportStatus {
     data object Running : ImportStatus
     data class FilesDone(val count: Int) : ImportStatus
     data class PlaylistDone(val matched: Int, val total: Int) : ImportStatus
+    data class ScanDone(val count: Int) : ImportStatus
     data class Failed(val message: String) : ImportStatus
 }
 
@@ -49,6 +50,23 @@ class SettingsViewModel @Inject constructor(
     private val _importStatus = MutableStateFlow<ImportStatus>(ImportStatus.Idle)
     val importStatus: StateFlow<ImportStatus> = _importStatus.asStateFlow()
 
+    fun rescanLibrary() {
+        _importStatus.value = ImportStatus.Running
+        viewModelScope.launch {
+            val count = repository.rescanLibrary()
+            _importStatus.value = ImportStatus.ScanDone(count)
+        }
+    }
+
+    fun resetExcludedFolders() {
+        _importStatus.value = ImportStatus.Running
+        viewModelScope.launch {
+            repository.resetExcludedFolders()
+            val count = repository.rescanLibrary()
+            _importStatus.value = ImportStatus.ScanDone(count)
+        }
+    }
+
     fun setTimelineStyle(style: TimelineStyle) = viewModelScope.launch {
         preferencesRepository.setTimelineStyle(style)
     }
@@ -66,16 +84,19 @@ class SettingsViewModel @Inject constructor(
     fun toggleFolderExclusion(folderPath: String) = viewModelScope.launch {
         val currentExclusions = preferences.value.excludedFolders
         val folderName = folderPath.substringAfterLast("/").ifBlank { folderPath }
-        val isExcluded = currentExclusions.any { 
-            it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
+        
+        val isExcluded = currentExclusions.contains(folderPath) || currentExclusions.contains(folderName) || currentExclusions.any { rule ->
+            rule.isNotBlank() && (folderPath.equals(rule, ignoreCase = true) || folderName.equals(rule, ignoreCase = true))
         }
+
         if (isExcluded) {
-            val matchedRule = currentExclusions.firstOrNull { 
-                it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
-            } ?: folderName
-            repository.removeExcludedFolder(matchedRule)
+            val matchedRules = currentExclusions.filter { rule ->
+                rule == folderPath || rule == folderName || (rule.isNotBlank() && (folderPath.equals(rule, ignoreCase = true) || folderName.equals(rule, ignoreCase = true)))
+            }
+            val remaining = currentExclusions - matchedRules.toSet() - folderPath - folderName
+            repository.updateExcludedFolders(remaining)
         } else {
-            repository.addExcludedFolder(folderName)
+            repository.addExcludedFolder(folderPath)
         }
     }
 

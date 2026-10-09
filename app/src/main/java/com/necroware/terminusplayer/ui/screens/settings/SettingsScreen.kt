@@ -272,6 +272,25 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                     }
                 }
                 2 -> {
+                    item { SectionLabel("LIBRARY ACTIONS & SCANNER") }
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            ActionRow("[ ↻ RESCAN ENTIRE LIBRARY ]", "Run full MediaStore discovery & update track cache") {
+                                viewModel.rescanLibrary()
+                            }
+                            ActionRow("[ ↺ RESET ALL FOLDER EXCLUSIONS ]", "Clear all exclusion rules & restore full library") {
+                                viewModel.resetExcludedFolders()
+                            }
+                            when (val s = importStatus) {
+                                ImportStatus.Idle -> Unit
+                                ImportStatus.Running -> StatusText("[ SCANNING MEDIASTORE LIBRARY... ]")
+                                is ImportStatus.ScanDone -> StatusText("[ SCANNED ${s.count} TRACKS ]")
+                                is ImportStatus.FilesDone -> StatusText("[ IMPORTED ${s.count} FILE${if (s.count == 1) "" else "S"} ]")
+                                is ImportStatus.PlaylistDone -> StatusText("[ MATCHED ${s.matched} / ${s.total} TRACKS ]")
+                                is ImportStatus.Failed -> StatusText("[ ${s.message.uppercase()} ]")
+                            }
+                        }
+                    }
                     item { SectionLabel("FOLDER EXCLUSIONS") }
                     item {
                         FolderExclusionSection(
@@ -306,6 +325,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                             }
                             when (val s = importStatus) {
                                 ImportStatus.Idle, ImportStatus.Running -> Unit
+                                is ImportStatus.ScanDone -> StatusText("[ SCANNED ${s.count} TRACKS ]")
                                 is ImportStatus.FilesDone -> StatusText("[ IMPORTED ${s.count} FILE${if (s.count == 1) "" else "S"} ]")
                                 is ImportStatus.PlaylistDone -> StatusText("[ MATCHED ${s.matched} / ${s.total} TRACKS ]")
                                 is ImportStatus.Failed -> StatusText("[ ${s.message.uppercase()} ]")
@@ -388,54 +408,65 @@ private fun TimelineStyleSection(
     onStyleChange: (TimelineStyle) -> Unit
 ) {
     val palette = LocalTerminalPalette.current
+    val visibleStyles = listOf(
+        TimelineStyle.HIGHLIGHTED_BLOCKS,
+        TimelineStyle.ARROW_RAIL,
+        TimelineStyle.ADAPTIVE_RAIL
+    )
+
     TerminalBorder(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
                 text = "TIMELINE INDICATOR STYLE",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
             )
 
-            TimelineStyle.entries.forEach { style ->
-                val isSelected = style == selectedStyle
-                Column(
+            visibleStyles.forEach { style ->
+                val isSelected = style == selectedStyle || (style == TimelineStyle.ADAPTIVE_RAIL && selectedStyle == TimelineStyle.STAR_RAIL)
+                TerminalBorder(
+                    borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onStyleChange(style) }
-                        .padding(vertical = 4.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = (if (isSelected) "> " else "  ") + when (style) {
-                                TimelineStyle.HIGHLIGHTED_BLOCKS -> "BLOCKS (HIGHLIGHTED TIP)"
-                                TimelineStyle.ARROW_RAIL -> "ARROW RAIL [=======>........]"
-                                TimelineStyle.STAR_RAIL -> "STAR RAIL [oooooooo*---------]"
-                            },
-                            style = MaterialTheme.typography.labelMedium,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                        )
-                        if (isSelected) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                text = "[ACTIVE]",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                text = (if (isSelected) "> " else "  ") + when (style) {
+                                    TimelineStyle.HIGHLIGHTED_BLOCKS -> "BLOCKS (HIGHLIGHTED TIP)"
+                                    TimelineStyle.ARROW_RAIL -> "ARROW RAIL [=======>........]"
+                                    TimelineStyle.ADAPTIVE_RAIL, TimelineStyle.STAR_RAIL -> "ADAPTIVE MORPH [- → * → o]"
+                                },
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
+                            if (isSelected) {
+                                Text(
+                                    text = "[ACTIVE]",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
-                    }
 
-                    BlockSeekBar(
-                        positionProvider = { 150000L },
-                        durationMs = 300000L,
-                        onSeek = {},
-                        style = style,
-                        tipColor = palette.highlightAccent,
-                        modifier = Modifier.padding(top = 4.dp).fillMaxWidth()
-                    )
+                        BlockSeekBar(
+                            positionProvider = { 150000L },
+                            durationMs = 300000L,
+                            onSeek = {},
+                            style = style,
+                            tipColor = palette.highlightAccent,
+                            interactive = false,
+                            modifier = Modifier.padding(top = 6.dp).fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
@@ -539,8 +570,8 @@ private fun FolderExclusionSection(
 
                     allFolders.forEach { folderPath ->
                         val folderName = folderPath.substringAfterLast("/").ifBlank { folderPath }
-                        val isExcluded = excludedFolders.any { 
-                            it.isNotBlank() && (folderPath.contains(it, ignoreCase = true) || folderName.contains(it, ignoreCase = true))
+                        val isExcluded = excludedFolders.contains(folderPath) || excludedFolders.contains(folderName) || excludedFolders.any { rule ->
+                            rule.isNotBlank() && (folderPath.equals(rule, ignoreCase = true) || folderName.equals(rule, ignoreCase = true))
                         }
 
                         Row(

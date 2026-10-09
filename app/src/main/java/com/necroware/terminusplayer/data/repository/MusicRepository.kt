@@ -53,6 +53,14 @@ class MusicRepository @Inject constructor(
         songDao.pruneDeleted(scanned.map { it.mediaStoreId })
     }
 
+    suspend fun rescanLibrary(): Int = withContext(Dispatchers.IO) {
+        val excludedFolders = preferencesRepository.preferences.first().excludedFolders
+        val scanned = scanner.scanAudioFiles(excludedFolders)
+        songDao.upsertAll(scanned)
+        songDao.pruneDeleted(scanned.map { it.mediaStoreId })
+        scanned.size
+    }
+
     fun observeAllSongs(): Flow<List<Song>> =
         combine(songDao.observeAllSongs(), likedSongDao.observeLikedIds()) { songs, likedIds ->
             val likedSet = likedIds.toHashSet()
@@ -282,6 +290,11 @@ class MusicRepository @Inject constructor(
 
     suspend fun removeExcludedFolder(folder: String) {
         preferencesRepository.removeExcludedFolder(folder)
+        syncLibrary()
+    }
+
+    suspend fun resetExcludedFolders() {
+        preferencesRepository.clearExcludedFolders()
         syncLibrary()
     }
 

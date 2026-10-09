@@ -86,6 +86,12 @@ class LibraryViewModel @Inject constructor(
         }
     }
 
+    fun rescanLibrary() {
+        viewModelScope.launch {
+            repository.syncLibrary()
+        }
+    }
+
     val folderNodes: StateFlow<List<FolderNode>> = combine(repository.observeAllSongs(), _currentFolderPath) { allSongs, currentPath ->
         if (currentPath == null) {
             val parentMap = allSongs.groupBy { song ->

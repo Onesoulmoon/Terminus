@@ -25,6 +25,7 @@ enum class VisualizerMode {
 enum class TimelineStyle {
     HIGHLIGHTED_BLOCKS,
     ARROW_RAIL,
+    ADAPTIVE_RAIL,
     STAR_RAIL
 }
 
@@ -77,5 +78,5 @@ data class UserPreferences(
     val usbExclusiveHqEnabled: Boolean = false,
     val realtimeVisualizerEnabled: Boolean = false,
     val timelineStyle: TimelineStyle = TimelineStyle.HIGHLIGHTED_BLOCKS,
-    val excludedFolders: Set<String> = setOf("WhatsApp", "WhatsApp Audio", "WhatsApp Voice Notes", "Recordings", "CallRecord")
+    val excludedFolders: Set<String> = emptySet()
 )

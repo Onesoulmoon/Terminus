@@ -75,7 +75,18 @@ class MediaStoreScanner @Inject constructor(
 
                 if (excludedFolders.isNotEmpty()) {
                     val isExcluded = excludedFolders.any { excluded ->
-                        excluded.isNotBlank() && (path.contains(excluded, ignoreCase = true) || folderPath.contains(excluded, ignoreCase = true))
+                        if (excluded.isBlank()) return@any false
+                        val cleanExcluded = excluded.trim()
+                        val isAbsolutePath = cleanExcluded.startsWith("/")
+                        if (isAbsolutePath) {
+                            folderPath.equals(cleanExcluded, ignoreCase = true) ||
+                            folderPath.startsWith("$cleanExcluded/", ignoreCase = true) ||
+                            path.equals(cleanExcluded, ignoreCase = true)
+                        } else {
+                            folderPath.equals(cleanExcluded, ignoreCase = true) ||
+                            folderPath.endsWith("/$cleanExcluded", ignoreCase = true) ||
+                            folderPath.contains("/$cleanExcluded/", ignoreCase = true)
+                        }
                     }
                     if (isExcluded) continue
                 }
