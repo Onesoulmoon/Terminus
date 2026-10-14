@@ -30,15 +30,42 @@ The result is a music player that feels less like a conventional media applicati
 
 ## Status
 
-**Current release: `2.3.0`**
+**Current release: `2.4.0`**
 
 Terminus is currently a functional local music player with persistent playback state, playlists, search, history/statistics, album artwork, background playback, queue management, audio controls, widgets, customizable visual behavior, and a complete terminal-inspired interface.
 
-The `2.3.0` release represents the current major polish pass, bringing together:
+The `2.4.0` release brings together:
 
 # TERMINUS PLAYER — RELEASE NOTES
 
-**Build Target:** v2.3.0
+**Build Target:** v2.4.0
+
+### 1. FLAC & High-Resolution AudioSink Downmixing
+* **`AudioEngine.kt` & `DecibelAudioProcessor.kt`**:
+  * Configured `DefaultAudioSink.Builder(context).setEnableFloatOutput(false)` in `AudioEngine.kt` to enforce 16-bit integer PCM downmixing.
+  * Ensures ExoPlayer automatically resamples 24-bit and 32-bit FLAC audio streams down to standard 16-bit PCM before `AudioTrack`, eliminating sample byte-alignment shifts, static noise, and piercing digital distortion.
+
+### 2. Morphing Character-Shift Progress Rail
+* **`BlockSeekBar.kt` & `MorphingAsciiTimelineRail`**:
+  * Added `MorphingAsciiTimelineRail` featuring animated playhead character transformations (`x` -> `o` -> `O` -> `*` -> `o` -> `x`).
+  * Updated `BlockSeekBar` so `TimelineStyle.ADAPTIVE_RAIL` and `TimelineStyle.STAR_RAIL` animate the playhead tip character in real time.
+
+### 3. Dynamic Custom Messages with Song, Artist & Album Metadata
+* **`StatsRepository.kt`, `HomeViewModel.kt` & `SystemInfoCard.kt`**:
+  * Eradicated all hardcoded fallback strings (`"Yeat"`, `"Turban"`, `"DJ Hustemane"`).
+  * Dynamically embeds real **Song Title**, **Artist Name**, and **Album Title** metadata into terminal metric logs.
+
+### 4. Timeline Range & Category Reactive Stats Messages
+* **`StatsViewModel.kt` & `StatsScreen.kt`**:
+  * `getCustomMessageForRangeAndCategory`: Dynamically re-evaluates and displays custom terminal messages whenever selecting any timeline range (`TODAY`, `WEEK`, `MONTH`, `YEAR`, `ALL_TIME`) or top category (`SONG`, `ALBUM`, `ARTIST`).
+
+### 5. Library `[GENRES]` Directory Section
+* **`LibraryViewModel.kt` & `LibraryScreen.kt`**:
+  * Added `LibraryTab.GENRES` displaying genre cards (`// GENRE_DIRECTORY`) with track count badges, expandable song lists, and fast-scrolling handle support.
+
+---
+
+**Previous Target:** v2.3.0
 
 ### 1. White Trace Visualizer Line
 * **`AudioSpectrumVisualizer.kt` & `SignalLiveHeader.kt`**:
