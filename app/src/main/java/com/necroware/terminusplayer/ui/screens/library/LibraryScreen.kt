@@ -40,18 +40,27 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.lazy.LazyListState
 
 import com.necroware.terminusplayer.ui.components.PixelatedAlbumArt
 import com.necroware.terminusplayer.util.safeGridItemClick
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.necroware.terminusplayer.ui.theme.TerminalFontFamily
 import com.necroware.terminusplayer.data.model.Album
+import com.necroware.terminusplayer.data.model.Artist
 import com.necroware.terminusplayer.ui.components.AddToPlaylistDialog
+import com.necroware.terminusplayer.ui.components.AsciiVisualizer
 import com.necroware.terminusplayer.ui.components.CreatePlaylistDialog
 import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
+import com.necroware.terminusplayer.ui.theme.LocalTerminalPalette
+import com.necroware.terminusplayer.ui.theme.LocalTerminusAccent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -66,6 +75,8 @@ fun LibraryScreen(
     val songs by viewModel.songs.collectAsStateWithLifecycle()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
     val artists by viewModel.artists.collectAsStateWithLifecycle()
+    val genres by viewModel.genres.collectAsStateWithLifecycle()
+    val expandedGenreName by viewModel.expandedGenreName.collectAsStateWithLifecycle()
     val folders by viewModel.folders.collectAsStateWithLifecycle()
     val customPlaylists by viewModel.customPlaylists.collectAsStateWithLifecycle()
 
@@ -74,12 +85,13 @@ fun LibraryScreen(
     var songForPlaylist by remember { mutableStateOf<Song?>(null) }
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
-    
+
     val songsListState = rememberLazyListState()
     val albumsGridState = rememberLazyGridState()
     val artistsListState = rememberLazyListState()
+    val genresListState = rememberLazyListState()
     val foldersListState = rememberLazyListState()
-    
+
     val coroutineScope = rememberCoroutineScope()
     val nowPlaying by viewModel.nowPlaying.collectAsStateWithLifecycle()
 
@@ -134,15 +146,16 @@ fun LibraryScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val palette = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current
+                val palette = LocalTerminalPalette.current
                 LibraryTab.entries.forEach { tab ->
                     val tabColor = when (tab) {
                         LibraryTab.SONGS -> palette.primaryAccent
                         LibraryTab.ALBUMS -> palette.secondaryAccent
                         LibraryTab.ARTISTS -> palette.tertiaryAccent
-                        LibraryTab.FOLDERS -> palette.highlightAccent
+                        LibraryTab.GENRES -> palette.highlightAccent
+                        LibraryTab.FOLDERS -> palette.secondaryAccent
                     }
                     Text(
                         text = "[${tab.name}]",
@@ -230,6 +243,94 @@ fun LibraryScreen(
                             }
                         }
                     }
+                    LibraryTab.GENRES -> {
+                        val palette = LocalTerminalPalette.current
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "// GENRE_DIRECTORY [${genres.size}]",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = TerminalFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            LazyColumn(
+                                state = genresListState,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize().padding(end = 12.dp)
+                            ) {
+                                items(genres, key = { it.name }) { genreGroup ->
+                                    val isExpanded = expandedGenreName == genreGroup.name
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        TerminalBorder(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { viewModel.toggleExpandGenre(genreGroup.name) }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Column {
+                                                    Text(
+                                                        text = "[ ${genreGroup.name.uppercase()} ]",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = palette.primaryAccent,
+                                                        fontFamily = TerminalFontFamily,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                    Text(
+                                                        text = if (isExpanded) "▲ COLLAPSE LIST" else "▼ VIEW TRACKS",
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                                        fontFamily = TerminalFontFamily
+                                                    )
+                                                }
+                                                Box(
+                                                    modifier = Modifier
+                                                        .background(palette.tertiaryAccent.copy(alpha = 0.15f))
+                                                        .border(1.dp, palette.tertiaryAccent.copy(alpha = 0.3f))
+                                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "${genreGroup.songCount} TRKS",
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = palette.tertiaryAccent,
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontFamily = TerminalFontFamily
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        if (isExpanded) {
+                                            Column(
+                                                modifier = Modifier.padding(start = 12.dp, top = 6.dp),
+                                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                genreGroup.songs.forEach { song ->
+                                                    SongRow(
+                                                        song = song,
+                                                        isCurrent = song.id.toString() == nowPlaying.mediaId || song.uriString == nowPlaying.mediaId,
+                                                        isPlaying = nowPlaying.isPlaying,
+                                                        onClick = { onSongClick(song, genreGroup.songs) },
+                                                        onLongClick = { songToOption = song },
+                                                        listState = genresListState
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     LibraryTab.FOLDERS -> {
                         val currentFolderPath by viewModel.currentFolderPath.collectAsStateWithLifecycle()
                         val folderNodes by viewModel.folderNodes.collectAsStateWithLifecycle()
@@ -246,7 +347,7 @@ fun LibraryScreen(
                                 ) {
                                     Text(
                                         text = "[..] UP ONE LEVEL // ${currentFolderPath?.substringAfterLast("/")}",
-                                        color = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current.secondaryAccent,
+                                        color = LocalTerminalPalette.current.secondaryAccent,
                                         fontFamily = TerminalFontFamily,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 12.sp
@@ -273,13 +374,13 @@ fun LibraryScreen(
                                             Text(
                                                 text = "[📁 ${folder.name}]",
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                color = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current.primaryAccent,
+                                                color = LocalTerminalPalette.current.primaryAccent,
                                                 fontFamily = TerminalFontFamily
                                             )
                                             Text(
                                                 text = "${folder.songCount} TRKS",
                                                 style = MaterialTheme.typography.labelSmall,
-                                                color = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current.tertiaryAccent,
+                                                color = LocalTerminalPalette.current.tertiaryAccent,
                                                 fontFamily = TerminalFontFamily
                                             )
                                         }
@@ -327,6 +428,12 @@ fun LibraryScreen(
                 listState = artistsListState,
                 itemCount = artists.size,
                 onScroll = { index -> coroutineScope.launch { artistsListState.scrollToItem(index) } }
+            )
+            LibraryTab.GENRES -> FastScrollHandle(
+                modifier = scrollerModifier,
+                listState = genresListState,
+                itemCount = genres.size,
+                onScroll = { index -> coroutineScope.launch { genresListState.scrollToItem(index) } }
             )
             LibraryTab.FOLDERS -> FastScrollHandle(
                 modifier = scrollerModifier,
@@ -409,12 +516,12 @@ private fun SquareAlbumCard(
     album: Album,
     modifier: Modifier = Modifier
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var bitmap by remember(album.representativeUriString) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    val context = LocalContext.current
+    var bitmap by remember(album.representativeUriString) { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(album.representativeUriString) {
         if (album.representativeUriString.isNotBlank()) {
-            val uri = android.net.Uri.parse(album.representativeUriString)
+            val uri = Uri.parse(album.representativeUriString)
             if (uri.scheme == "content") {
                 bitmap = try {
                     context.contentResolver.loadThumbnail(uri, android.util.Size(200, 200), null)
@@ -493,8 +600,8 @@ private fun SquareAlbumCard(
 
 @Composable
 private fun ArtistRow(
-    artist: com.necroware.terminusplayer.data.model.Artist,
-    listState: androidx.compose.foundation.lazy.LazyListState,
+    artist: Artist,
+    listState: LazyListState,
     onClick: () -> Unit
 ) {
     TerminalBorder(
@@ -549,9 +656,9 @@ private fun SongRow(
     isPlaying: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    listState: androidx.compose.foundation.lazy.LazyListState
+    listState: LazyListState
 ) {
-    val accentColor = com.necroware.terminusplayer.ui.theme.LocalTerminusAccent.current
+    val accentColor = LocalTerminusAccent.current
     TerminalBorder(
         borderColor = if (isCurrent) accentColor else MaterialTheme.colorScheme.outline,
         modifier = Modifier
@@ -568,7 +675,7 @@ private fun SongRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SongArt(uriString = song.uriString, size = 42.dp)
-            
+
             Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
                 Text(
                     text = song.title,
@@ -596,7 +703,7 @@ private fun SongRow(
                 contentAlignment = Alignment.Center
             ) {
                 if (isCurrent) {
-                    com.necroware.terminusplayer.ui.components.AsciiVisualizer(
+                    AsciiVisualizer(
                         isPlaying = isPlaying,
                         barCount = 4,
                         accentColor = accentColor
@@ -628,7 +735,7 @@ private fun SongRow(
 @Composable
 private fun FastScrollHandleGrid(
     modifier: Modifier = Modifier,
-    gridState: androidx.compose.foundation.lazy.grid.LazyGridState,
+    gridState: LazyGridState,
     itemCount: Int,
     onScroll: (Int) -> Unit
 ) {
@@ -670,7 +777,7 @@ private fun FastScrollHandleGrid(
             },
         contentAlignment = Alignment.TopCenter
     ) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val w = size.width
             val h = size.height
             val segmentCount = 20
@@ -680,7 +787,7 @@ private fun FastScrollHandleGrid(
             repeat(segmentCount) { index ->
                 val top = index * segmentHeight
                 val isThumb = index == thumbIndex
-                
+
                 val blockW = w * 0.3f
                 val blockH = segmentHeight * 0.7f
                 val left = (w - blockW) / 2
@@ -708,7 +815,7 @@ private fun FastScrollHandleGrid(
 @Composable
 private fun FastScrollHandle(
     modifier: Modifier = Modifier,
-    listState: androidx.compose.foundation.lazy.LazyListState,
+    listState: LazyListState,
     itemCount: Int,
     onScroll: (Int) -> Unit
 ) {
@@ -750,7 +857,7 @@ private fun FastScrollHandle(
             },
         contentAlignment = Alignment.TopCenter
     ) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val w = size.width
             val h = size.height
             val segmentCount = 20
@@ -760,7 +867,7 @@ private fun FastScrollHandle(
             repeat(segmentCount) { index ->
                 val top = index * segmentHeight
                 val isThumb = index == thumbIndex
-                
+
                 val blockW = w * 0.3f
                 val blockH = segmentHeight * 0.7f
                 val left = (w - blockW) / 2

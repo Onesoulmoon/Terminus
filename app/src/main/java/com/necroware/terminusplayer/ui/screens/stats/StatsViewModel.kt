@@ -41,7 +41,6 @@ class StatsViewModel @Inject constructor(
     val uiState: StateFlow<StatsUiState> = _uiState.asStateFlow()
 
     init {
-        loadInsightsOnce()
         load(StatsRange.WEEK, TopCategory.ARTIST)
     }
 
@@ -59,6 +58,7 @@ class StatsViewModel @Inject constructor(
             val summary = statsRepository.getSummary(range)
             val topItems = statsRepository.getTopCategory(range, category)
             val sessionStats = statsRepository.getSessionStats(range)
+            val customMessage = statsRepository.getCustomMessageForRangeAndCategory(range, category)
 
             // Only fetch the chart data the currently-selected range actually needs.
             val monthlyArtists = if (range == StatsRange.MONTH) statsRepository.getMonthlyArtistDistribution() else emptyList()
@@ -72,16 +72,10 @@ class StatsViewModel @Inject constructor(
                 playsByHour = summary.playsByHour,
                 sessionStats = sessionStats,
                 topCategoryItems = topItems,
+                insights = listOf(customMessage),
                 monthlyArtistDistribution = monthlyArtists,
                 yearlyMonthlyTotals = yearlyMonthly
             )
-        }
-    }
-
-    private fun loadInsightsOnce() {
-        viewModelScope.launch {
-            val insights = statsRepository.generateInsights()
-            _uiState.value = _uiState.value.copy(insights = insights)
         }
     }
 }

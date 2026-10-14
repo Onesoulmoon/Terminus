@@ -24,13 +24,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class LibraryTab { SONGS, ALBUMS, ARTISTS, FOLDERS }
+enum class LibraryTab { SONGS, ALBUMS, ARTISTS, GENRES, FOLDERS }
 
 data class FolderNode(
     val name: String,
     val fullPath: String,
     val isDirectory: Boolean,
     val songCount: Int = 0
+)
+
+data class GenreGroup(
+    val name: String,
+    val songCount: Int,
+    val songs: List<Song>
 )
 
 @HiltViewModel
@@ -49,8 +55,15 @@ class LibraryViewModel @Inject constructor(
     private val _currentFolderPath = MutableStateFlow<String?>(null)
     val currentFolderPath: StateFlow<String?> = _currentFolderPath
 
+    private val _expandedGenreName = MutableStateFlow<String?>(null)
+    val expandedGenreName: StateFlow<String?> = _expandedGenreName
+
     fun setSelectedTab(tab: LibraryTab) {
         _selectedTab.value = tab
+    }
+
+    fun toggleExpandGenre(genreName: String) {
+        _expandedGenreName.value = if (_expandedGenreName.value == genreName) null else genreName
     }
 
     private val sortOrder: StateFlow<LibrarySortOrder> = preferencesRepository.preferences
@@ -66,6 +79,18 @@ class LibraryViewModel @Inject constructor(
 
     val artists: StateFlow<List<Artist>> = repository.observeAllArtists()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val genres: StateFlow<List<GenreGroup>> = repository.observeAllSongs().map { allSongs ->
+        allSongs.groupBy { song ->
+            song.genre.ifBlank { "Unknown Genre" }
+        }.map { (genreName, songsInGenre) ->
+            GenreGroup(
+                name = genreName,
+                songCount = songsInGenre.size,
+                songs = songsInGenre.sortedBy { it.title.lowercase() }
+            )
+        }.sortedBy { it.name.lowercase() }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val folders: StateFlow<List<String>> = repository.observeAllFolders()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

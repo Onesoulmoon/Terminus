@@ -30,7 +30,7 @@ data class HomeUiState(
     val isPlaying: Boolean = false,
     val audioLevel: Float = 0f,
     val dynamicMetricLog: String = "",
-    val topArtistName: String = "Yeat"
+    val topArtistName: String = ""
 )
 
 @HiltViewModel
@@ -120,8 +120,12 @@ class HomeViewModel @Inject constructor(
     private suspend fun reloadWeekSummary() {
         val summary = statsRepository.getSummary(StatsRange.WEEK)
         val insights = statsRepository.generateInsights()
-        val topLog = insights.firstOrNull() ?: "METRIC // TOP_ARTIST: 'Yeat' leading the log tracking matrix index with ${summary.totalPlays} recorded playback cycles this week."
-        val topArtist = summary.topArtists.firstOrNull()?.artist ?: "Yeat"
+        val topArtist = summary.topArtists.firstOrNull()?.artist
+            ?: repository.observeAllArtists().first().firstOrNull()?.name
+            ?: ""
+        val topLog = insights.firstOrNull()
+            ?: if (topArtist.isNotBlank()) "METRIC // TOP_ARTIST: '$topArtist' leading playback matrix with ${summary.totalPlays} recorded cycles."
+               else "METRIC // SYSTEM: Terminal engine ready. Select a track to initialize metric tracking matrix."
 
         _uiState.value = _uiState.value.copy(
             weekPlays = summary.totalPlays,

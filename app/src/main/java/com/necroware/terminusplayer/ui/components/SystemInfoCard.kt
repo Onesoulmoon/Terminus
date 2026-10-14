@@ -1,6 +1,10 @@
 package com.necroware.terminusplayer.ui.components
 
+import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,7 +30,7 @@ fun SystemInfoCard(
     likedCount: Int,
     weekPlays: Int,
     weekMsPlayed: Long,
-    topArtist: String = "Yeat",
+    topArtist: String = "",
     metricLogText: String = "",
     modifier: Modifier = Modifier
 ) {
@@ -76,14 +80,18 @@ fun SystemInfoCard(
 
 @Composable
 fun TerminalMetricLogCard(
-    topArtist: String = "Yeat",
-    weekPlays: Int = 9,
+    topArtist: String = "",
+    weekPlays: Int = 0,
     logText: String = "",
     modifier: Modifier = Modifier
 ) {
     val palette = LocalTerminalPalette.current
     val textToShow = logText.ifBlank {
-        "METRIC // TOP_ARTIST: '$topArtist' leading the log tracking matrix index with $weekPlays recorded playback cycles this week."
+        if (topArtist.isNotBlank()) {
+            "METRIC // TOP_ARTIST: '$topArtist' leading the log tracking matrix index with $weekPlays recorded playback cycles this week."
+        } else {
+            "METRIC // SYSTEM: Terminal engine ready. Select a track to initialize metric tracking matrix."
+        }
     }
 
     TerminalBorder(modifier = modifier.fillMaxWidth()) {
@@ -101,16 +109,16 @@ fun TerminalMetricLogCard(
 }
 
 private fun readDeviceInfo(context: Context): DeviceReadout {
-    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
-    val memInfo = android.app.ActivityManager.MemoryInfo()
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+    val memInfo = ActivityManager.MemoryInfo()
     activityManager?.getMemoryInfo(memInfo)
     val totalBytes = memInfo.totalMem.toFloat()
     val availBytes = memInfo.availMem.toFloat()
     val usedGb = ((totalBytes - availBytes) / (1024f * 1024f * 1024f))
     val totalGb = totalBytes / (1024f * 1024f * 1024f)
 
-    val batteryIntent = context.registerReceiver(null, android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))
-    val tempTenths = batteryIntent?.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
+    val batteryIntent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    val tempTenths = batteryIntent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
     val tempC = if (tempTenths >= 0) tempTenths / 10f else null
 
     return DeviceReadout(ramUsedGb = usedGb, ramTotalGb = totalGb, batteryTempC = tempC)

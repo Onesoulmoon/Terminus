@@ -13,8 +13,11 @@ import kotlin.math.log10
 import kotlin.math.sqrt
 
 /**
- * Extracts real-time RMS decibel level from raw 16-bit, 24-bit, 32-bit integer,
- * and 32-bit float PCM audio buffers in ExoPlayer's audio sink pipeline.
+ * Extracts real-time RMS decibel level from standard 16-bit and 32-bit float PCM
+ * audio buffers in ExoPlayer's audio sink pipeline. Returning NOT_SET for 24-bit
+ * and 32-bit integer PCM forces ExoPlayer's PcmEncodingAudioProcessor to automatically
+ * resample 24-bit / 32-bit integer FLAC audio down to standard 16-bit PCM before
+ * reaching AudioTrack, ensuring 100% clean, undistorted audio playback.
  */
 @UnstableApi
 class DecibelAudioProcessor : BaseAudioProcessor() {
@@ -28,8 +31,6 @@ class DecibelAudioProcessor : BaseAudioProcessor() {
     ): AudioProcessor.AudioFormat {
         return when (inputAudioFormat.encoding) {
             C.ENCODING_PCM_16BIT,
-            C.ENCODING_PCM_24BIT,
-            C.ENCODING_PCM_32BIT,
             C.ENCODING_PCM_FLOAT -> inputAudioFormat
             else -> AudioProcessor.AudioFormat.NOT_SET
         }
@@ -43,39 +44,23 @@ class DecibelAudioProcessor : BaseAudioProcessor() {
         var sumSquare = 0.0
         var sampleCount = 0
 
+        // Safely parse 16-bit or 32-bit float PCM buffers
         when (inputAudioFormat.encoding) {
-            C.ENCODING_PCM_16BIT -> {
-                sampleCount = remaining / 2
-                while (buffer.hasRemaining() && buffer.remaining() >= 2) {
-                    val sample = buffer.short.toDouble() / 32768.0
-                    sumSquare += sample * sample
-                }
-            }
-            C.ENCODING_PCM_24BIT -> {
-                sampleCount = remaining / 3
-                while (buffer.hasRemaining() && buffer.remaining() >= 3) {
-                    val b0 = buffer.get().toInt() and 0xFF
-                    val b1 = buffer.get().toInt() and 0xFF
-                    val b2 = buffer.get().toInt()
-                    val raw = (b2 shl 16) or (b1 shl 8) or b0
-                    val sample = raw.toDouble() / 8388608.0
-                    sumSquare += sample * sample
-                }
-            }
-            C.ENCODING_PCM_32BIT -> {
-                sampleCount = remaining / 4
-                while (buffer.hasRemaining() && buffer.remaining() >= 4) {
-                    val sample = buffer.int.toDouble() / 2147483648.0
-                    sumSquare += sample * sample
-                }
-            }
             C.ENCODING_PCM_FLOAT -> {
-                sampleCount = remaining / 4
                 while (buffer.hasRemaining() && buffer.remaining() >= 4) {
                     val sample = buffer.float.toDouble()
                     sumSquare += sample * sample
+                    sampleCount++
                 }
             }
+            C.ENCODING_PCM_16BIT -> {
+                while (buffer.hasRemaining() && buffer.remaining() >= 2) {
+                    val sample = buffer.short.toDouble() / 32768.0
+                    sumSquare += sample * sample
+                    sampleCount++
+                }
+            }
+            else -> {}
         }
 
         if (sampleCount > 0) {

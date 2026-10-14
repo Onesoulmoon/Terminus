@@ -14,17 +14,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.necroware.terminusplayer.data.repository.StatsRange
 import com.necroware.terminusplayer.data.repository.TopCategory
 import com.necroware.terminusplayer.data.repository.TopCategoryItem
+import com.necroware.terminusplayer.ui.components.AreaChart
+import com.necroware.terminusplayer.ui.components.AreaPoint
 import com.necroware.terminusplayer.ui.components.BarDatum
 import com.necroware.terminusplayer.ui.components.BlockyBarChart
+import com.necroware.terminusplayer.ui.components.LineChart
+import com.necroware.terminusplayer.ui.components.PieChart
+import com.necroware.terminusplayer.ui.components.PieSlice
+import com.necroware.terminusplayer.ui.components.ScatterPlot
 import com.necroware.terminusplayer.ui.components.TerminalBorder
 import com.necroware.terminusplayer.ui.components.TerminalTypewriterHeader
+import com.necroware.terminusplayer.ui.theme.LocalTerminalPalette
+import com.necroware.terminusplayer.ui.theme.TerminalFontFamily
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,6 +43,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val palette = LocalTerminalPalette.current
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
@@ -51,8 +62,12 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                 TerminalBorder(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = insight,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        fontFamily = TerminalFontFamily,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = palette.tertiaryAccent,
+                        lineHeight = 18.sp,
+                        modifier = Modifier.padding(4.dp)
                     )
                 }
             }
@@ -60,7 +75,6 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                val palette = com.necroware.terminusplayer.ui.theme.LocalTerminalPalette.current
                 StatsRange.entries.forEachIndexed { idx, range ->
                     val rangeColor = when (idx % 4) {
                         0 -> palette.primaryAccent
@@ -71,7 +85,7 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                     Text(
                         text = "[${range.label}]",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (range == state.range) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal,
+                        fontWeight = if (range == state.range) FontWeight.Bold else FontWeight.Normal,
                         color = if (range == state.range) rangeColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.clickable { viewModel.selectRange(range) }
                     )
@@ -140,16 +154,16 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                         if (state.playsByHour.isNotEmpty()) {
                             val countByHour = state.playsByHour.associate { it.hourOfDay to it.playCount }
                             val fullDayValues = (0..23).map { hour -> (countByHour[hour] ?: 0).toFloat() }
-                            com.necroware.terminusplayer.ui.components.LineChart(values = fullDayValues)
+                            LineChart(values = fullDayValues)
                         } else if (!state.isLoading) {
                             EmptyChartMessage()
                         }
                     }
                     StatsRange.MONTH -> {
                         if (state.monthlyArtistDistribution.isNotEmpty()) {
-                            com.necroware.terminusplayer.ui.components.PieChart(
+                            PieChart(
                                 slices = state.monthlyArtistDistribution.map {
-                                    com.necroware.terminusplayer.ui.components.PieSlice(it.first, it.second.toFloat())
+                                    PieSlice(it.first, it.second.toFloat())
                                 }
                             )
                         } else if (!state.isLoading) {
@@ -158,9 +172,9 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                     }
                     StatsRange.YEAR -> {
                         if (state.yearlyMonthlyTotals.isNotEmpty()) {
-                            com.necroware.terminusplayer.ui.components.AreaChart(
+                            AreaChart(
                                 points = state.yearlyMonthlyTotals.map {
-                                    com.necroware.terminusplayer.ui.components.AreaPoint(monthLabelShort(it.first), it.second.toFloat())
+                                    AreaPoint(monthLabelShort(it.first), it.second.toFloat())
                                 }
                             )
                         } else if (!state.isLoading) {
@@ -169,7 +183,7 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                     }
                     StatsRange.ALL_TIME -> {
                         if (state.playsByDay.isNotEmpty()) {
-                            com.necroware.terminusplayer.ui.components.ScatterPlot(
+                            ScatterPlot(
                                 values = state.playsByDay.map { it.playCount.toFloat() }
                             )
                         } else if (!state.isLoading) {
@@ -206,10 +220,11 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
                         Text(
                             text = "[${category.label}]",
                             style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (category == state.category) FontWeight.Bold else FontWeight.Normal,
                             color = if (category == state.category) {
                                 MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             },
                             modifier = Modifier.clickable { viewModel.selectCategory(category) }
                         )
