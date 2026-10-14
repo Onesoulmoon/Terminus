@@ -46,8 +46,11 @@ class AudioEngine(
                 enableFloatOutput: Boolean,
                 enableAudioTrackPlaybackParams: Boolean
             ): AudioSink {
+                // Force 16-bit PCM integer conversion by disabling float output on the sink builder.
+                // This forces ExoPlayer to resample all 24-bit and 32-bit FLAC audio streams into
+                // standard 16-bit PCM before reaching decibelProcessor or AudioTrack.
                 val sinkBuilder = DefaultAudioSink.Builder(context)
-                    .setEnableFloatOutput(true)
+                    .setEnableFloatOutput(false)
 
                 if (isBitPerfectDirectMode) {
                     // Bypass software speed/pitch resampling algorithms for bit-perfect output
